@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-set -e
 
-script="typescript/day_$1.ts"
+run="ts-node --pretty typescript/day_$1.ts"
 
 if [[ -n $2 ]]; then
   while true; do
-    yarn run ts-node $script
+    date
+    $run
     echo
     sleep $2
   done
 else
-  yarn run ts-node $script
+  set -e
+  $run
 fi
