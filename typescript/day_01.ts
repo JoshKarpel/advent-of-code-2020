@@ -7,3 +7,4 @@ console.log(lines)
 const asNumbers = lines.map(Number)
 
 console.log(asNumbers)
+console.log(asNumbers)
