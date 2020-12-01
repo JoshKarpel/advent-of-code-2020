@@ -1,6 +1,6 @@
 import fs = require('fs');
 
-export function printSolution (day: number, part: number, solution: number): void {
+export function printSolution (day: number, part: number, solution: number | null): void {
   console.log(`Day ${day}, Part ${part} => ${solution}`)
 }
 
