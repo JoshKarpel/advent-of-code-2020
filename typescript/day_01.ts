@@ -1,30 +1,24 @@
+import { combinations } from './util'
 import util = require('./util');
 
-function part1 (entries: ReadonlyArray<number>): number | null {
-  for (const [aIdx, a] of entries.entries()) {
-    for (const b of entries.slice(aIdx + 1)) {
-      if (a + b === 2020) {
-        return a * b
-      }
+function solve (entries: Array<number>, target: number, k: number): number | null {
+  for (const combo of combinations(entries, k)) {
+    if (combo.reduce((acc, curr) => acc + curr) === target) {
+      return combo.reduce((acc, curr) => acc * curr)
     }
   }
   return null
 }
 
-function part2 (entries: ReadonlyArray<number>): number | null {
-  for (const [aIdx, a] of entries.entries()) {
-    for (const [bIdx, b] of entries.slice(aIdx + 1).entries()) {
-      for (const c of entries.slice(aIdx + bIdx + 1)) {
-        if (a + b + c === 2020) {
-          return a * b * c
-        }
-      }
-    }
-  }
-  return null
+function part1 (entries: Array<number>): number | null {
+  return solve(entries, 2020, 2)
 }
 
-const entries: ReadonlyArray<number> = util.readFileLines('data/day_01.txt').map(Number)
+function part2 (entries: Array<number>): number | null {
+  return solve(entries, 2020, 3)
+}
+
+const entries = util.readFileLines('data/day_01.txt').map(Number)
 
 util.printSolution(1, 1, part1(entries))
 util.printSolution(1, 2, part2(entries))
