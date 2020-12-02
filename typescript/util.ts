@@ -19,3 +19,12 @@ export function * combinations<T> (arr: Array<T>, k: number) : Generator<Array<T
     }
   }
 }
+
+export function regExtract (str: string, re: RegExp): RegExpMatchArray {
+  const match = re.exec(str)
+  if (match === null) {
+    throw new Error(`failed match on: ${str}`)
+  } else {
+    return match
+  }
+}

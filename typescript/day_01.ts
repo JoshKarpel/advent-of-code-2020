@@ -1,8 +1,7 @@
-import { combinations } from './util'
 import util = require('./util');
 
 function solve (entries: Array<number>, target: number, k: number): number | null {
-  for (const combo of combinations(entries, k)) {
+  for (const combo of util.combinations(entries, k)) {
     if (combo.reduce((acc, curr) => acc + curr) === target) {
       return combo.reduce((acc, curr) => acc * curr)
     }
