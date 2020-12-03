@@ -1,45 +1,35 @@
 import util = require('./util');
 
-function part1 (map: ReadonlyArray<string>): number {
+const TREE = '#'
+
+function solve (map: ReadonlyArray<string>, across: number, down: number): number {
   let x = 0
   let count = 0
-  for (const row of map) {
-    if (row.charAt(x % row.length) === '#') {
+  for (let rowIdx = 0; rowIdx < map.length; rowIdx += down) {
+    const row = map[rowIdx]
+    if (row === undefined) { throw new Error('woops') }
+    if (row.charAt(x % row.length) === TREE) {
       count += 1
     }
-    x += 3
+    x += across
   }
   return count
 }
 
+function part1 (map: ReadonlyArray<string>): number {
+  return solve(map, 3, 1)
+}
+
 function part2 (map: ReadonlyArray<string>): number {
-  const counts = []
-  for (const inc of [1, 3, 5, 7]) {
-    let x = 0
-    let count = 0
-    for (const row of map) {
-      if (row.charAt(x % row.length) === '#') {
-        count += 1
-      }
-      x += inc
-    }
-    counts.push(count)
-  }
-
-  let x = 0
-  let count = 0
-  for (const [idx, row] of map.entries()) {
-    if ((idx + 1) % 2 === 0) { continue }
-    if (row.charAt(x % row.length) === '#') {
-      count += 1
-    }
-    x += 1
-  }
-  counts.push(count)
-
-  console.log(counts)
-
-  return counts.reduce((acc, curr) => acc * curr)
+  return [
+    { across: 1, down: 1 },
+    { across: 3, down: 1 },
+    { across: 5, down: 1 },
+    { across: 7, down: 1 },
+    { across: 1, down: 2 }
+  ]
+    .map(({ across, down }) => solve(map, across, down))
+    .reduce((acc, curr) => acc * curr)
 }
 
 const map = util.readFileLines('data/day_03.txt')
