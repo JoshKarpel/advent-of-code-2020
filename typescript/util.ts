@@ -4,6 +4,10 @@ export function printSolution (day: number, part: number, solution: number | nul
   console.log(`Day ${day}, Part ${part} => ${solution}`)
 }
 
+export function readFile (path: string): string {
+  return fs.readFileSync(path, 'utf8').trimEnd()
+}
+
 export function readFileLines (path: string): ReadonlyArray<string> {
   return fs.readFileSync(path, 'utf8').trimEnd().split('\n')
 }
