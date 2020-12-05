@@ -27,13 +27,13 @@ function part2 (map: ReadonlyArray<string>): number {
     { across: 3, down: 1 },
     { across: 5, down: 1 },
     { across: 7, down: 1 },
-    { across: 1, down: 2 }
+    { across: 1, down: 2 },
   ]
     .map(({ across, down }) => solve(map, across, down))
     .reduce((acc, curr) => acc * curr)
 }
 
-const map = util.readFileLines('data/day_03.txt')
+const map = util.readFile('data/day_03.txt').split('\n')
 
 util.printSolution(3, 1, part1(map))
 util.printSolution(3, 2, part2(map))

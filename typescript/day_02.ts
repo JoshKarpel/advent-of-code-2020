@@ -22,14 +22,15 @@ function part2 (entries: Array<Entry>): number {
   }).length
 }
 
-const entries = util.readFileLines('data/day_02.txt')
+const entries = util.readFile('data/day_02.txt')
+  .split('\n')
   .map(line => util.regExtract(line, /(\d+)-(\d+) (\w): (\w+)/))
   .map(match => {
     return {
       first: Number(match[1]),
       second: Number(match[2]),
       letter: String(match[3]),
-      password: String(match[4])
+      password: String(match[4]),
     }
   })
 

@@ -6,11 +6,11 @@ function seatID (instructions: string): number {
   }).join(''), 2)
 }
 
-function part1 (seats: string[]): number {
+function part1 (seats: Array<string>): number {
   return Math.max(...seats.map(seatID))
 }
 
-function part2 (seats: string[]): number | null {
+function part2 (seats: Array<string>): number | null {
   const ids = seats.map(seatID).sort()
   let prev = -1
   for (const id of ids) {

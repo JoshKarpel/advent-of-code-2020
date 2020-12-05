@@ -1,70 +1,43 @@
-import { regExtract } from './util'
 import util = require('./util');
 
-const NEEDED = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+const REQUIRED = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+const FIELDS = new Map([
+  ['cid', /.*/],
+  ['byr', /^(19[2-9]\d|200[0-2])$/],
+  ['iyr', /^201\d|2020$/],
+  ['eyr', /^202\d|2030$/],
+  ['hgt', /^(1([5-8]\d|9[0-3])cm|(59|6\d|7[0-6])in)$/],
+  ['hcl', /^#[0-9a-f]{6}$/],
+  ['ecl', /^(amb|blu|brn|gry|grn|hzl|oth)$/],
+  ['pid', /^\d{9}$/],
+])
 
-function part1 (foo: Array<Map<string, string>>): number {
-  return foo.filter(f => {
-    return NEEDED.every(n => {
-      return f.has(n)
-    })
-  }).length
+type Passport = Map<string, string>
+
+function hasRequiredFields (passport: Passport): boolean {
+  return REQUIRED.every(field => passport.has(field))
 }
 
-function part2 (foo: Array<Map<string, string>>): number {
-  return foo.filter(f => {
-    return NEEDED.every(n => {
-      return f.has(n)
-    })
-  }).filter(m => { // @ts-ignore
-    console.log()
-    return Array.from(m.entries()).every(([k, v]) => {
-      let rv: boolean = false
-      try {
-        console.log(k, v)
-        if (k === 'cid') {
-          rv = true
-        } else if (k === 'byr') {
-          const n = Number(regExtract(v, /^(\d{4})$/)[1])
-          rv = n >= 1920 && n <= 2002
-        } else if (k === 'iyr') {
-          const n = Number(regExtract(v, /^(\d{4})$/)[1])
-          rv = n >= 2010 && n <= 2020
-        } else if (k === 'eyr') {
-          const n = Number(regExtract(v, /^(\d{4})$/)[1])
-          rv = n >= 2020 && n <= 2030
-        } else if (k === 'hgt') {
-          const match = regExtract(v, /^(\d+)(cm|in)$/)
-          const n = Number(match[1])
-          if (match[2] === 'cm') {
-            rv = n >= 150 && n <= 193
-          } else {
-            rv = n >= 59 && n <= 76
-          }
-        } else if (k === 'hcl') {
-          regExtract(v, /^#[0-9a-f]{6}$/)
-          rv = true
-        } else if (k === 'ecl') {
-          regExtract(v, /^(amb|blu|brn|gry|grn|hzl|oth)$/)
-          rv = true
-        } else if (k === 'pid') {
-          regExtract(v, /^\d{9}$/)
-          rv = true
-        }
-      } catch {
-        rv = false
-      }
-      console.log(rv)
-      return rv
-    })
-  }
-  ).length
+function validValues (passport: Passport) : boolean {
+  return Array.from(passport.entries()).every(([k, v]) => {
+    const regex = FIELDS.get(k)
+    if (regex === undefined) { throw new Error('bad field') }
+    return regex.exec(v) !== null
+  })
 }
 
-const foo = util.readFile('data/day_04.txt')
+function part1 (foo: Array<Passport>): number {
+  return foo.filter(hasRequiredFields).length
+}
+
+function part2 (foo: Array<Passport>): number {
+  return foo.filter(hasRequiredFields).filter(validValues).length
+}
+
+const passports: Array<Passport> = util.readFile('data/day_04.txt')
   .split('\n\n')
   .map(l => l.split(/\s+/))
   .map(l => new Map(l.map(x => x.split(':') as [string, string])))
 
-util.printSolution(4, 1, part1(foo))
-util.printSolution(4, 2, part2(foo))
+util.printSolution(4, 1, part1(passports))
+util.printSolution(4, 2, part2(passports))
