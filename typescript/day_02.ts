@@ -25,7 +25,12 @@ function part2 (entries: Array<Entry>): number {
 const entries = util.readFileLines('data/day_02.txt')
   .map(line => util.regExtract(line, /(\d+)-(\d+) (\w): (\w+)/))
   .map(match => {
-    return { first: Number(match[1]), second: Number(match[2]), letter: String(match[3]), password: String(match[4]) }
+    return {
+      first: Number(match[1]),
+      second: Number(match[2]),
+      letter: String(match[3]),
+      password: String(match[4])
+    }
   })
 
 util.printSolution(2, 1, part1(entries))

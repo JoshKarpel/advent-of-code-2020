@@ -5,9 +5,10 @@ const TREE = '#'
 function solve (map: ReadonlyArray<string>, across: number, down: number): number {
   let x = 0
   let count = 0
-  for (let rowIdx = 0; rowIdx < map.length; rowIdx += down) {
-    const row = map[rowIdx]
-    if (row === undefined) { throw new Error('woops') }
+  for (const [rowIdx, row] of map.entries()) {
+    if (rowIdx % down !== 0) {
+      continue
+    }
     if (row.charAt(x % row.length) === TREE) {
       count += 1
     }
