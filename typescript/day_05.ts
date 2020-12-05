@@ -11,11 +11,15 @@ function part1 (seats: string[]): number {
 }
 
 function part2 (seats: string[]): number | null {
-  const ids = new Set(seats.map(seatID))
-  for (let i = 0; i < Math.max(...ids); i += 1) {
-    if (ids.has(i - 1) && ids.has(i + 1) && !ids.has(i)) {
-      return i
+  const ids = seats.map(seatID).sort()
+  let prev = -1
+  for (const id of ids) {
+    // did we skip an ID?
+    if (id === prev + 2) {
+      // the missing ID is in the gap
+      return prev + 1
     }
+    prev = id
   }
   return null
 }
