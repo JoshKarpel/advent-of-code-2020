@@ -28,3 +28,17 @@ export function regExtract (str: string, re: RegExp): RegExpMatchArray {
     return match
   }
 }
+
+export function union<T> (a: Iterable<T>, b: Iterable<T>): Set<T> {
+  return new Set([...a, ...b])
+}
+
+export function intersection<T> (a: Iterable<T>, b: Iterable<T>): Set<T> {
+  const bSet = new Set(Array.from(b))
+  return new Set(Array.from(a).filter(x => bSet.has(x)))
+}
+
+export function difference<T> (a: Iterable<T>, b: Iterable<T>): Set<T> {
+  const bSet = new Set(Array.from(b))
+  return new Set(Array.from(a).filter(x => !bSet.has(x)))
+}
