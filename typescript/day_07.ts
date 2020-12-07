@@ -4,52 +4,41 @@ type Rules = Map<string, Map<string, number>>
 
 const SPECIAL_BAG = 'shiny gold'
 
+function unpackBag (startingBag: string, rules: Rules): Map<string, number> {
+  const bagsToUnpack: Array<[string, number]> = [[startingBag, 1]]
+  const unpackedBags = new Map()
+
+  while (bagsToUnpack.length > 0) {
+    const [unpacking, numUnpacking] = bagsToUnpack.shift() as [string, number] // we won't be in here unless length > 0
+    const newBags = rules.get(unpacking) || new Map()
+    for (const [newBag, count] of newBags.entries()) {
+      unpackedBags.set(newBag, (unpackedBags.get(newBag) || 0) + (count * numUnpacking))
+      bagsToUnpack.push([newBag, count * numUnpacking])
+    }
+  }
+
+  return unpackedBags
+}
+
+function unpackAllBags (rules: Rules): Map<string, Map<string, number>> {
+  return new Map(Array.from(rules.keys())
+    .map(startingBag => [startingBag, unpackBag(startingBag, rules)]),
+  )
+}
+
 function part1 (rules: Rules): number {
-  const totalBags = Array.from(rules.keys())
-    .map(
-      startingBag => {
-        const bagsToUnpack = [[startingBag, 1]]
-        const totalBags = new Map([[startingBag, 1]])
+  const unpackedBags = unpackAllBags(rules)
 
-        while (bagsToUnpack.length > 0) {
-          const [unpacking, numUnpacking] = bagsToUnpack.shift() as [string, number]
-          const newBags = rules.get(unpacking) as Map<string, number>
-          for (const [newBag, count] of newBags.entries()) {
-            totalBags.set(newBag, (totalBags.get(newBag) || 0) + (count * numUnpacking))
-            bagsToUnpack.push([newBag, count * numUnpacking])
-          }
-        }
-
-        return [startingBag, totalBags]
-      },
-    ) as Array<[string, Map<string, number>]>
-
-  return totalBags
+  return Array.from(unpackedBags.entries())
     .filter(([startingBag, unpacked]) => startingBag !== SPECIAL_BAG && unpacked.has(SPECIAL_BAG))
     .length
 }
 
 function part2 (rules: Rules): number {
-  const totalBags = new Map(Array.from(rules.keys())
-    .map(
-      startingBag => {
-        const bagsToUnpack = [[startingBag, 1]]
-        const totalBags = new Map()
+  const unpackedBags = unpackAllBags(rules)
 
-        while (bagsToUnpack.length > 0) {
-          const [unpacking, numUnpacking] = bagsToUnpack.shift() as [string, number]
-          const newBags = rules.get(unpacking) as Map<string, number>
-          for (const [newBag, count] of newBags.entries()) {
-            totalBags.set(newBag, (totalBags.get(newBag) || 0) + (count * numUnpacking))
-            bagsToUnpack.push([newBag, count * numUnpacking])
-          }
-        }
-
-        return [startingBag, totalBags]
-      },
-    ) as Array<[string, Map<string, number>]>)
-
-  return Array.from((totalBags.get(SPECIAL_BAG) as Map<string, number>).values()).reduce((acc, sum) => acc + sum)
+  return Array.from((unpackedBags.get(SPECIAL_BAG) || new Map()).values())
+    .reduce((acc, sum) => acc + sum)
 }
 
 const rules = new Map(
