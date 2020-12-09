@@ -1,59 +1,39 @@
-import util = require('./util');
+import { HGC, Instruction, Instructions } from './hgc'
+import { printSolution } from './util'
 
-type Instruction = [string, number]
-
-function run (instructions: Array<Instruction>) : [number, boolean] {
-  let acc = 0
-  let pointer = 0
-
-  const seen = new Set()
-
-  while (true) {
-    const terminated = pointer === instructions.length
-    if (seen.has(pointer) || terminated) {
-      return [acc, terminated]
-    }
-    seen.add(pointer)
-
-    const [instr, arg] = instructions[pointer] || ['noop', 0]
-
-    if (instr === 'acc') {
-      acc += arg
-    } else if (instr === 'jmp') {
-      pointer += arg - 1
-    }
-
-    pointer += 1
+function runUntilLoop (hgc: HGC): HGC {
+  while (!hgc.seen.has(hgc.pointer)) {
+    hgc.seen.add(hgc.pointer)
+    hgc = hgc.step()
   }
+  return hgc
 }
 
 function part1 (instructions: Array<Instruction>): number {
-  const [acc] = run(instructions)
-  return acc
+  const hgc = new HGC(instructions)
+  return runUntilLoop(hgc).accumulator
 }
 
-function part2 (instructions: Array<Instruction>): number {
-  for (const [idx, [instr, num]] of instructions.entries()) {
+function part2 (instructions: Array<Instruction>): number | null {
+  for (const [idx, instruction] of instructions.entries()) {
     const fixed = [...instructions]
-    if (instr === 'jmp') {
-      fixed[idx] = ['nop', num]
+
+    if (instruction.operation === 'jmp') {
+      fixed[idx] = { operation: 'nop', argument: instruction.argument }
+    } else if (instruction.operation === 'nop') {
+      fixed[idx] = { operation: 'jmp', argument: instruction.argument }
     }
-    const [acc, terminated] = run(fixed)
-    console.log(acc, terminated)
-    if (terminated) {
-      return acc
+
+    const hgc = runUntilLoop(new HGC(fixed))
+    if (hgc.terminated) {
+      return hgc.accumulator
     }
   }
-  return 0
+
+  return null
 }
 
-const instructions: Array<Instruction> = util.readFile('data/day_08.txt')
-  .split('\n')
-  .map(line => {
-    const [instr, num] = line.split(' ')
+const instructions: Instructions = HGC.instructionsFromFile('data/day_08.txt')
 
-    return [instr as string, Number(num) as number]
-  })
-
-util.printSolution(8, 1, part1(instructions))
-util.printSolution(8, 2, part2(instructions))
+printSolution(8, 1, part1(instructions))
+printSolution(8, 2, part2(instructions))
