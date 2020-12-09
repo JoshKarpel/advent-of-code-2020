@@ -1,3 +1,4 @@
+import { sumReducer } from './util'
 import util = require('./util');
 
 type Rules = Map<string, Map<string, number>>
@@ -37,8 +38,7 @@ function part1 (rules: Rules): number {
 function part2 (rules: Rules): number {
   const unpackedBags = unpackAllBags(rules)
 
-  return Array.from((unpackedBags.get(SPECIAL_BAG) || new Map()).values())
-    .reduce((acc, sum) => acc + sum)
+  return Array.from((unpackedBags.get(SPECIAL_BAG) || new Map()).values()).reduce(sumReducer)
 }
 
 const rules = new Map(

@@ -42,3 +42,11 @@ export function difference<T> (a: Iterable<T>, b: Iterable<T>): Set<T> {
   const bSet = new Set(Array.from(b))
   return new Set(Array.from(a).filter(x => !bSet.has(x)))
 }
+
+export function sumReducer (accumulator: number, current: number): number {
+  return accumulator + current
+}
+
+export function prefixSum (arr: Array<number>) : Array<number> {
+  return arr.reduce((acc:Array<number>, curr:number) => acc.concat([acc[acc.length - 1] + curr]), [0]).slice(1)
+}
