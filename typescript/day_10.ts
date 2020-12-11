@@ -1,5 +1,7 @@
 import { count, printSolution, readFile, sumReducer } from './util'
 
+const START = 0
+
 function builtInAdapterRating (adapters: Array<number>) :number {
   return Math.max(...adapters) + 3
 }
@@ -21,7 +23,7 @@ function buildGraph (adapters: Array<number>): Map<number, Array<number>> {
 function part1 (adapters: Array<number>): number {
   const graph = buildGraph(adapters)
 
-  const path = [0]
+  const path = [START]
   const diffs = []
   while (path[path.length - 1] !== builtInAdapterRating(adapters)) {
     const prev = path[path.length - 1] || 0
@@ -37,26 +39,29 @@ function part1 (adapters: Array<number>): number {
 }
 
 function part2 (adapters: Array<number>): number {
-  const graph = buildGraph(adapters)
-
-  return numPaths(graph, 0, builtInAdapterRating(adapters), new Map())
+  return numPaths(buildGraph(adapters), START, builtInAdapterRating(adapters))
 }
 
-function numPaths (graph: Map<number, Array<number>>, start: number, end: number, cache: Map<number, number>): number {
+function numPaths (
+  graph: Map<number, Array<number>>,
+  start: number,
+  end: number,
+  cache: Map<number, number> = new Map(),
+): number {
   if (start === end) {
     return 1
   }
 
-  const alreadySeen = cache.get(start)
-  if (alreadySeen !== undefined) {
-    return alreadySeen
+  const alreadyCounted = cache.get(start)
+  if (alreadyCounted !== undefined) {
+    return alreadyCounted
   }
 
-  const nexts = graph.get(start) || []
+  const nextAdapters = graph.get(start) || []
 
-  const count = nexts.map(next => numPaths(graph, next, end, cache)).reduce(sumReducer)
-  cache.set(start, count)
-  return count
+  const numPathsBelowStart = nextAdapters.map(next => numPaths(graph, next, end, cache)).reduce(sumReducer)
+  cache.set(start, numPathsBelowStart)
+  return numPathsBelowStart
 }
 
 const adapters = readFile('data/day_10.txt').split('\n').map(Number)
