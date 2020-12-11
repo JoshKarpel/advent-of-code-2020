@@ -1,4 +1,4 @@
-import { count, printSolution, readFile, sumReducer } from './util'
+import { count, printSolution, readFile, sortNumbers, sumReducer } from './util'
 
 const START = 0
 
@@ -38,7 +38,7 @@ function part1 (adapters: Array<number>): number {
   return (counts.get(1) || 0) * (counts.get(3) || 0)
 }
 
-function part2 (adapters: Array<number>): number {
+function part2WithRecursion (adapters: Array<number>): number {
   return numPaths(buildGraph(adapters), START, builtInAdapterRating(adapters))
 }
 
@@ -64,7 +64,24 @@ function numPaths (
   return numPathsBelowStart
 }
 
+function part2WithoutRecursion (adapters: Array<number>): number {
+  const graph = buildGraph(adapters)
+
+  const numPathsTo = new Map([[0, 1]])
+
+  for (const adapter of Array.from(graph.keys()).sort(sortNumbers)) {
+    const numPathsToHere = numPathsTo.get(adapter) || 0
+
+    for (const next of (graph.get(adapter) || [])) {
+      numPathsTo.set(next, (numPathsTo.get(next) || 0) + numPathsToHere)
+    }
+  }
+
+  return numPathsTo.get(builtInAdapterRating(adapters)) || 0
+}
+
 const adapters = readFile('data/day_10.txt').split('\n').map(Number)
 
 printSolution(10, 1, part1(adapters))
-printSolution(10, 2, part2(adapters))
+printSolution(10, 2, part2WithRecursion(adapters))
+printSolution(10, 2, part2WithoutRecursion(adapters))

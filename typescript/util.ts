@@ -58,3 +58,7 @@ export function count<T> (arr: Array<T>) : Map<T, number> {
   }
   return counter
 }
+
+export function sortNumbers (a: number, b: number) {
+  return a - b
+}

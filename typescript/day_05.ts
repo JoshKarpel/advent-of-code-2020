@@ -1,3 +1,4 @@
+import { sortNumbers } from './util'
 import util = require('./util');
 
 function seatID (instructions: string): number {
@@ -11,7 +12,7 @@ function part1 (seats: Array<string>): number {
 }
 
 function part2 (seats: Array<string>): number | null {
-  const ids = seats.map(seatID).sort()
+  const ids = seats.map(seatID).sort(sortNumbers)
   let prev = -1
   for (const id of ids) {
     // did we skip an ID?
