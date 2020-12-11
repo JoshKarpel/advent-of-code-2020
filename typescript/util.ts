@@ -50,3 +50,11 @@ export function sumReducer (accumulator: number, current: number): number {
 export function prefixSum (arr: Array<number>) : Array<number> {
   return arr.reduce((acc:Array<number>, curr:number) => acc.concat([acc[acc.length - 1] + curr]), [0]).slice(1)
 }
+
+export function count<T> (arr: Array<T>) : Map<T, number> {
+  const counter = new Map()
+  for (const x of arr) {
+    counter.set(x, (counter.get(x) || 0) + 1)
+  }
+  return counter
+}
