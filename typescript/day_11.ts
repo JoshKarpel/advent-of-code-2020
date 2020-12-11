@@ -1,24 +1,13 @@
-import { Grid } from './grid'
+import { ADJACENT_OFFSETS, Grid } from './grid'
 import { printSolution } from './util'
 
 const FLOOR = '.'
 const EMPTY = 'L'
 const OCCUPIED = '#'
 
-const ADJACENT_OFFSETS = [
-  [-1, -1],
-  [-1, 0],
-  [-1, 1],
-  [0, -1],
-  [0, 1],
-  [1, -1],
-  [1, 0],
-  [1, 1],
-]
-
 function countAdjacentOccupied (grid: Grid<string>, x: number, y: number) : number {
-  return ADJACENT_OFFSETS
-    .map(([xOffset, yOffset]) => grid.get(x + xOffset, y + yOffset))
+  return grid
+    .offsetValues(x, y, ADJACENT_OFFSETS)
     .filter(seat => seat === OCCUPIED)
     .length
 }
@@ -61,7 +50,10 @@ function solve (
     }
   }
 
-  return grid.values().filter(seat => seat === OCCUPIED).length
+  return grid
+    .values()
+    .filter(seat => seat === OCCUPIED)
+    .length
 }
 
 function part1 (grid: Grid<string>): number {
