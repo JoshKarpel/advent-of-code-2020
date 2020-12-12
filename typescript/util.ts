@@ -62,3 +62,7 @@ export function count<T> (arr: Array<T>) : Map<T, number> {
 export function sortNumbers (a: number, b: number) {
   return a - b
 }
+
+export function mod (n: number, m: number) : number {
+  return ((n % m) + m) % m
+}
