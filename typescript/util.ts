@@ -66,3 +66,7 @@ export function sortNumbers (a: number, b: number) {
 export function mod (n: number, m: number) : number {
   return ((n % m) + m) % m
 }
+
+export function zip<A, B> (a: Array<A>, b: Array<B>): Array<[A, B]> {
+  return Array.from(a.entries()).map(([idx, elem]) => [elem, b[idx]])
+}

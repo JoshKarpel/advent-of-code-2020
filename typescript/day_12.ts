@@ -1,4 +1,5 @@
-import { mod, printSolution, readFile } from './util'
+import { printSolution, readFile } from './util'
+import { Vector2 } from './vector'
 
 const NORTH = 'N'
 const SOUTH = 'S'
@@ -8,65 +9,61 @@ const LEFT = 'L'
 const RIGHT = 'R'
 const FORWARD = 'F'
 
-const DIRECTIONS = [NORTH, EAST, SOUTH, WEST]
+const DIRECTIONS = new Map([
+  [EAST, new Vector2(1, 0)],
+  [WEST, new Vector2(-1, 0)],
+  [NORTH, new Vector2(0, 1)],
+  [SOUTH, new Vector2(0, -1)],
+])
 
 type Instruction = [string, number]
-type Position = {
-  [direction: string]: number
-}
 
 function part1 (instructions: Array<Instruction>): number {
-  const position: Position = { N: 0, E: 0, W: 0, S: 0 }
-  let facing = EAST
+  let position = new Vector2(0, 0)
+  let facing = new Vector2(1, 0)
 
   for (const [op, arg] of instructions) {
     if (op === FORWARD) {
-      position[facing] += arg
+      position = position.add(facing.mul(arg))
     } else if (op === RIGHT) {
-      facing = DIRECTIONS[mod(DIRECTIONS.indexOf(facing) + (arg / 90), DIRECTIONS.length)]
+      facing = facing.cw(arg)
     } else if (op === LEFT) {
-      facing = DIRECTIONS[mod(DIRECTIONS.indexOf(facing) - (arg / 90), DIRECTIONS.length)]
+      facing = facing.ccw(arg)
     } else {
-      position[op] += arg
+      const direction = DIRECTIONS.get(op)
+      if (direction === undefined) {
+        throw new Error('bad direction')
+      }
+      const move = direction.mul(arg)
+      position = position.add(move)
     }
   }
 
-  return Math.abs(position[NORTH] - position[SOUTH]) + Math.abs(position[EAST] - position[WEST])
+  return Math.round(position.manhattan())
 }
 
 function part2 (instructions: Array<Instruction>): number {
-  const position: Position = { N: 0, E: 0, W: 0, S: 0 }
-  let waypoint: Position = { N: 1, E: 10, W: 0, S: 0 }
+  let position = new Vector2(0, 0)
+  let waypoint = new Vector2(10, 1)
 
   for (const [op, arg] of instructions) {
     if (op === FORWARD) {
-      for (const dir of DIRECTIONS) {
-        position[dir] += waypoint[dir] * arg
-      }
+      position = position.add(waypoint.mul(arg))
     } else if (op === RIGHT) {
-      for (let i = 0; i < (arg / 90); i += 1) {
-        waypoint = rotateRight(waypoint)
-      }
+      waypoint = waypoint.cw(arg)
     } else if (op === LEFT) {
-      for (let i = 0; i < (arg / 90); i += 1) {
-        waypoint = rotateRight(rotateRight(rotateRight(waypoint)))
-      }
+      waypoint = waypoint.ccw(arg)
     } else {
-      waypoint[op] += arg
+      const direction = DIRECTIONS.get(op)
+      if (direction === undefined) {
+        throw new Error('bad direction')
+      }
+      const move = direction.mul(arg)
+      waypoint = waypoint.add(move)
     }
-    console.log(position, waypoint)
   }
 
-  return Math.abs(position[NORTH] - position[SOUTH]) + Math.abs(position[EAST] - position[WEST])
-}
-
-function rotateRight (position: Position): Position {
-  return {
-    E: position[NORTH] - position[SOUTH],
-    N: -(position[EAST] - position[WEST]),
-    S: 0,
-    W: 0,
-  }
+  return Math.round(position.manhattan())
 }
 
 const instructions: Array<Instruction> = readFile('data/day_12.txt')
