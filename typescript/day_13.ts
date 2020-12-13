@@ -1,11 +1,13 @@
-import { mod, printSolution, readFile } from './util'
+import { chineseRemainderSieve, mod, printSolution, readFile } from './util'
 
-function part1 (earliest: number, ids: Array<number>): number {
+function part1 (earliest: number, ids: Array<string>): number {
+  const recurrenceTimes = ids.filter(id => id !== 'x').map(Number)
+
   let wait = 0
   while (true) {
-    for (const id of ids) {
-      if ((wait + earliest) % id === 0) {
-        return wait * id
+    for (const time of recurrenceTimes) {
+      if ((wait + earliest) % time === 0) {
+        return wait * time
       }
     }
     wait += 1
@@ -13,30 +15,17 @@ function part1 (earliest: number, ids: Array<number>): number {
 }
 
 function part2 (ids: Array<string>): number {
-  const withIdx: Array<[number, number]> = Array.from(ids.entries())
+  const divisorsAndRemainders: Array<[number, number]> = Array.from(ids.entries())
     .filter(([_idx, id]) => id !== 'x')
     .map(([idx, id]) => [idx, Number(id)])
-
-  const justIds = withIdx.map(([_idx, id]) => id)
-
-  const divisorsAndRemainders = withIdx
     .map(([idx, id]) => [id, mod(id - idx, id)])
 
-  let t = justIds[0]
-  let inc = justIds[0]
-  for (const [div, rem] of divisorsAndRemainders.slice(1)) {
-    while (mod(t, div) !== rem) {
-      t += inc
-    }
-    inc *= div
-  }
-
-  return t
+  return chineseRemainderSieve(divisorsAndRemainders)
 }
 
 const [rawEarliest, rawIds] = readFile('data/day_13.txt').split('\n')
 const earliest = Number(rawEarliest)
-const ids = rawIds.split(',').filter(id => id !== 'x').map(Number)
+const ids = rawIds.split(',')
 
 printSolution(13, 1, part1(earliest, ids))
-printSolution(13, 2, part2(rawIds.split(',')))
+printSolution(13, 2, part2(ids))

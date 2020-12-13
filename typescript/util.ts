@@ -70,3 +70,17 @@ export function mod (n: number, m: number) : number {
 export function zip<A, B> (a: Array<A>, b: Array<B>): Array<[A, B]> {
   return Array.from(a.entries()).map(([idx, elem]) => [elem, b[idx]])
 }
+
+// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
+export function chineseRemainderSieve (divisorsAndRemainders: Array<[number, number]>) :number {
+  let [increment, x] = divisorsAndRemainders[0]
+
+  for (const [divisor, remainder] of divisorsAndRemainders.slice(1)) {
+    while (mod(x, divisor) !== remainder) {
+      x += increment
+    }
+    increment *= divisor
+  }
+
+  return x
+}
