@@ -19,6 +19,19 @@ export function * combinations<T> (arr: Array<T>, k: number) : Generator<Array<T
     }
   }
 }
+export function * permutations<T> (arr: Array<T>, k: number) : Generator<Array<T>> {
+  if (k === 1) {
+    for (const elem of arr) {
+      yield [elem]
+    }
+  } else {
+    for (const next of permutations(arr, k - 1)) {
+      for (const elem of arr) {
+        yield [elem].concat(next)
+      }
+    }
+  }
+}
 
 export function regExtract (str: string, re: RegExp): RegExpMatchArray {
   const match = re.exec(str)
