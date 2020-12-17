@@ -1,4 +1,4 @@
-import { mulReducer, printSolution, readFile, regExtract } from './util'
+import { difference, mulReducer, printSolution, readFile, regExtract, sumReducer } from './util'
 
 type Ticket = Array<number>
 type Tickets = Array<Ticket>
@@ -21,47 +21,40 @@ class Field {
 
 type Fields = Array<Field>
 
-// function part1 (fields: Fields, tickets: Tickets): number {
-//   return tickets
-//     .flatMap(ticket => ticket.filter(t => !fields.some(field => field.check(t))))
-//     .reduce(sumReducer)
-// }
+function part1 (fields: Fields, tickets: Tickets): number {
+  return tickets
+    .flatMap(ticket => ticket.filter(t => !fields.some(field => field.check(t))))
+    .reduce(sumReducer)
+}
 
 function part2 (fields: Fields, tickets: Tickets, myTicket: Ticket): number {
-  const validTickets = tickets
-    .filter(ticket => ticket.every(t => fields.some(field => field.check(t))))
+  const validTickets = tickets.filter(ticket => ticket.every(t => fields.some(field => field.check(t))))
 
-  const unassignedFields = [...fields]
   const fieldIndices = Array.from(myTicket.keys())
 
-  const orderedFields = Array(fields.length)
+  const possiblePositions: Array<[Field, Set<number>]> = fields
+    .map(testField =>
+      [
+        testField,
+        new Set(
+          fieldIndices.filter(fieldIdx => validTickets.every(ticket => testField.check(ticket[fieldIdx]))),
+        ),
+      ],
+    )
 
-  while (unassignedFields.length > 0) {
-    const testField = unassignedFields.shift() as Field
+  possiblePositions.sort(([_f1, s1], [_f2, s2]) => s1.size - s2.size)
 
-    const validPositions = fieldIndices.map(fieldIdx => {
-      if (validTickets.every(ticket => testField.check(ticket[fieldIdx]))) {
-        return fieldIdx
-      } else {
-        return -1
-      }
-    }).filter(fieldIdx => fieldIdx !== -1)
-    console.log('Testing', testField.name, validPositions)
+  const orderedFields: Map<number, Field> = new Map()
 
-    if (validPositions.length === 1) {
-      const idx = validPositions[0]
-      orderedFields[idx] = testField
-      fieldIndices.splice(idx, 1)
-      console.log('found', testField.name, idx)
-      console.log(orderedFields)
-      console.log(fieldIndices, fieldIndices.length)
-      console.log()
+  for (const [field, possibilities] of possiblePositions) {
+    const unusedPossibilities = difference(possibilities, orderedFields.keys())
+    if (unusedPossibilities.size === 1) {
+      const idx = unusedPossibilities.values().next().value as number
+      orderedFields.set(idx, field)
     } else {
-      unassignedFields.push(testField)
+      throw new Error('this problem is too hard')
     }
   }
-
-  console.log(orderedFields)
 
   return Array.from(orderedFields.entries())
     .filter(([_idx, field]) => field.name.startsWith('departure'))
@@ -85,5 +78,5 @@ const fields = rawFields
 const myTicket: Ticket = rawMyTicket.split('\n')[1].split(',').map(Number)
 const tickets: Tickets = rawTickets.split('\n').slice(1).map(line => line.split(',').map(Number))
 
-// printSolution(16, 1, part1(fields, tickets))
+printSolution(16, 1, part1(fields, tickets))
 printSolution(16, 2, part2(fields, tickets, myTicket))
