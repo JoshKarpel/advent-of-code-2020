@@ -1,18 +1,18 @@
-import { ADJACENT_OFFSETS, Grid } from './grid'
+import { ADJACENT_OFFSETS, Grid2 } from './grid'
 import { printSolution } from './util'
 
 const FLOOR = '.'
 const EMPTY = 'L'
 const OCCUPIED = '#'
 
-function countAdjacentOccupied (grid: Grid<string>, x: number, y: number) : number {
+function countAdjacentOccupied (grid: Grid2<string>, x: number, y: number) : number {
   return grid
     .offsetValues(x, y, ADJACENT_OFFSETS)
     .filter(seat => seat === OCCUPIED)
     .length
 }
 
-function countVisibleOccupied (grid: Grid<string>, x: number, y: number) : number {
+function countVisibleOccupied (grid: Grid2<string>, x: number, y: number) : number {
   return ADJACENT_OFFSETS
     .map(([xOffset, yOffset]) => {
       let distance = 0
@@ -30,8 +30,8 @@ function countVisibleOccupied (grid: Grid<string>, x: number, y: number) : numbe
 }
 
 function solve (
-  grid: Grid<string>,
-  counter: (grid: Grid<string>, x: number, y: number) => number,
+  grid: Grid2<string>,
+  counter: (grid: Grid2<string>, x: number, y: number) => number,
   occupiedLimit: number,
 ) : number {
   grid = grid.copy()
@@ -56,15 +56,15 @@ function solve (
     .length
 }
 
-function part1 (grid: Grid<string>): number {
+function part1 (grid: Grid2<string>): number {
   return solve(grid, countAdjacentOccupied, 4)
 }
 
-function part2 (grid: Grid<string>): number {
+function part2 (grid: Grid2<string>): number {
   return solve(grid, countVisibleOccupied, 5)
 }
 
-const grid = Grid.fromFile('data/day_11.txt', char => char)
+const grid = Grid2.fromFile('data/day_11.txt', char => char)
 
 printSolution(11, 1, part1(grid))
 printSolution(11, 2, part2(grid))

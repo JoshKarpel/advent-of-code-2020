@@ -21,7 +21,7 @@ export const DIAGONAL_OFFSETS: Offsets = [
 export const ADJACENT_OFFSETS: Offsets = MANHATTAN_OFFSETS.concat(DIAGONAL_OFFSETS)
 export const TILE_OFFSETS: Offsets = ADJACENT_OFFSETS.concat(SELF_OFFSETS)
 
-export class Grid<T> {
+export class Grid2<T> {
     grid: Array<Array<T>>
 
     constructor (grid: Array<Array<T>>) {
@@ -89,12 +89,12 @@ export class Grid<T> {
         .map(([_x, _y, t]) => t)
     }
 
-    equalTo (other: Grid<T>): boolean {
+    equalTo (other: Grid2<T>): boolean {
       return isDeepStrictEqual(this, other)
     }
 
-    copy (): Grid<T> {
-      return new Grid(this.grid.map(row => [...row]))
+    copy (): Grid2<T> {
+      return new Grid2(this.grid.map(row => [...row]))
     }
 
     fmt (): string {
@@ -105,8 +105,8 @@ export class Grid<T> {
       console.log(this.fmt() + '\n')
     }
 
-    static fromFile<T> (path: string, converter: (char: string) => T): Grid<T> {
-      return new Grid(
+    static fromFile<T> (path: string, converter: (char: string) => T): Grid2<T> {
+      return new Grid2(
         readFile(path)
           .split('\n')
           .map(line => line.split('').map(converter)),
