@@ -1,11 +1,16 @@
 import { printSolution, readFile } from './util'
 
-type RawRules = Map<string, Array<string>>;
+type RawRule = Array<string>
+type RawRules = Map<string, RawRule>;
 
-function part1 (rules: RawRules, messages: Array<string>): number {
+function solve (
+  rules: RawRules,
+  messages: Array<string>,
+  regExpConstructor: (rules: RawRules, rule: Array<string>) => string,
+): number {
   const ruleMap = new Map(
     Array.from(rules.entries())
-      .map(([n, rule]) => [n, constructRegExpSource(rules, rule)]),
+      .map(([n, rule]) => [n, regExpConstructor(rules, rule)]),
   )
 
   const ruleZero = getRuleZero(ruleMap)
@@ -13,18 +18,7 @@ function part1 (rules: RawRules, messages: Array<string>): number {
   return messages.filter(message => message.match(ruleZero)).length
 }
 
-function part2 (rules: RawRules, messages: Array<string>): number {
-  const ruleMap = new Map(
-    Array.from(rules.entries())
-      .map(([n, rule]) => [n, constructRegExpSource2(rules, rule)]),
-  )
-
-  const ruleZero = getRuleZero(ruleMap)
-
-  return messages.filter(message => message.match(ruleZero)).length
-}
-
-function constructRegExpSource (rules: RawRules, rule: Array<string>): string {
+function constructRegExpSource (rules: RawRules, rule: RawRule): string {
   const parts = [...rule]
   while (parts.some(c => rules.has(c))) {
     for (const [idx, part] of parts.entries()) {
@@ -37,7 +31,7 @@ function constructRegExpSource (rules: RawRules, rule: Array<string>): string {
   return parts.join('')
 }
 
-function constructRegExpSource2 (rules: RawRules, rule: Array<string>): string {
+function constructRegExpSource2 (rules: RawRules, rule: RawRule): string {
   const parts = [...rule]
   while (parts.some(c => rules.has(c))) {
     for (const [idx, part] of parts.entries()) {
@@ -67,16 +61,12 @@ function getRuleZero (ruleMap: Map<string, string>): RegExp {
   if (ruleZeroSource === undefined) {
     throw new Error('no rule 0!')
   }
-  return addStartEnd(ruleZeroSource)
+  return RegExp(`^${ruleZeroSource}$`)
 }
 
-function addStartEnd (source: string): RegExp {
-  return RegExp(`^${source}$`)
-}
-
-const [rawRules, rawMessages] = readFile('data/day_19.txt').split('\n\n')
-const rules: RawRules = new Map(
-  rawRules
+const [rawestRules, rawMessages] = readFile('data/day_19.txt').split('\n\n')
+const rawRules: RawRules = new Map(
+  rawestRules
     .split('\n')
     .map(line => {
       const [n, rawRule] = line.split(': ')
@@ -91,8 +81,7 @@ const rules: RawRules = new Map(
     },
     ),
 )
-
 const messages = rawMessages.split('\n')
 
-printSolution(19, 1, part1(rules, messages))
-printSolution(19, 2, part2(rules, messages))
+printSolution(19, 1, solve(rawRules, messages, constructRegExpSource))
+printSolution(19, 2, solve(rawRules, messages, constructRegExpSource2))
