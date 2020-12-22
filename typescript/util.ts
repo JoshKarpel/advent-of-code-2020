@@ -102,3 +102,7 @@ export function chineseRemainderSieve (divisorsAndRemainders: Array<[number, num
 
   return x
 }
+
+export function reverseString (str: string): string {
+  return str.split('').reverse().join('')
+}
