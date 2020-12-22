@@ -2,7 +2,7 @@ import { count, printSolution, readFile, sortNumbers, sumReducer } from './util'
 
 const START = 0
 
-function builtInAdapterRating (adapters: Array<number>) :number {
+function builtInAdapterRating (adapters: Array<number>): number {
   return Math.max(...adapters) + 3
 }
 

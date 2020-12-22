@@ -17,6 +17,17 @@ class Grid17 {
       this.grid = new Map()
     }
 
+    static fromFile (path: string, dimension: number): Grid17 {
+      const grid = new Grid17()
+      const raw = readFile(path)
+      for (const [y, row] of raw.split('\n').entries()) {
+        for (const [x, elem] of row.split('').entries()) {
+          grid.set([x, y].concat(Array(dimension - 2).fill(0)), elem as Activity)
+        }
+      }
+      return grid
+    }
+
     values (): Array<Activity> {
       return Array.from(this.grid.values())
     }
@@ -53,17 +64,6 @@ class Grid17 {
         newGrid.grid.set(k, v)
       }
       return newGrid
-    }
-
-    static fromFile (path: string, dimension: number): Grid17 {
-      const grid = new Grid17()
-      const raw = readFile(path)
-      for (const [y, row] of raw.split('\n').entries()) {
-        for (const [x, elem] of row.split('').entries()) {
-          grid.set([x, y].concat(Array(dimension - 2).fill(0)), elem as Activity)
-        }
-      }
-      return grid
     }
 
     evolve (): Grid17 {

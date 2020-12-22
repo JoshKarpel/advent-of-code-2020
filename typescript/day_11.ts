@@ -5,14 +5,14 @@ const FLOOR = '.'
 const EMPTY = 'L'
 const OCCUPIED = '#'
 
-function countAdjacentOccupied (grid: Grid2<string>, x: number, y: number) : number {
+function countAdjacentOccupied (grid: Grid2<string>, x: number, y: number): number {
   return grid
     .offsetValues(x, y, ADJACENT_OFFSETS)
     .filter(seat => seat === OCCUPIED)
     .length
 }
 
-function countVisibleOccupied (grid: Grid2<string>, x: number, y: number) : number {
+function countVisibleOccupied (grid: Grid2<string>, x: number, y: number): number {
   return ADJACENT_OFFSETS
     .map(([xOffset, yOffset]) => {
       let distance = 0
@@ -33,7 +33,7 @@ function solve (
   grid: Grid2<string>,
   counter: (grid: Grid2<string>, x: number, y: number) => number,
   occupiedLimit: number,
-) : number {
+): number {
   grid = grid.copy()
   let prevGrid = null
 

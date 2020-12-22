@@ -1,10 +1,10 @@
 import util = require('./util');
 
 interface Entry {
-  first: number,
-  second: number,
-  letter: string,
-  password: string
+    first: number,
+    second: number,
+    letter: string,
+    password: string
 }
 
 function part1 (entries: Array<Entry>): number {

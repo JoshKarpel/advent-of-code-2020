@@ -6,17 +6,17 @@ type Tickets = Array<Ticket>
 type Range = { lower: number, upper: number }
 
 class Field {
-  readonly name: string
-  readonly ranges: Array<Range>
+    readonly name: string
+    readonly ranges: Array<Range>
 
-  constructor (name: string, ranges: Array<Range>) {
-    this.name = name
-    this.ranges = ranges
-  }
+    constructor (name: string, ranges: Array<Range>) {
+      this.name = name
+      this.ranges = ranges
+    }
 
-  check (n: number): boolean {
-    return this.ranges.some(range => n >= range.lower && n <= range.upper)
-  }
+    check (n: number): boolean {
+      return this.ranges.some(range => n >= range.lower && n <= range.upper)
+    }
 }
 
 type Fields = Array<Field>

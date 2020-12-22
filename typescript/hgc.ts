@@ -30,6 +30,19 @@ export class HGC {
       this.parent = parent
     }
 
+    static fromFile (path: string): HGC {
+      return new HGC(HGC.instructionsFromFile(path))
+    }
+
+    static instructionsFromFile (path: string): Instructions {
+      return readFile(path)
+        .split('\n')
+        .map(line => {
+          const [op, arg] = line.split(' ')
+          return { operation: op as Operation, argument: Number(arg) as number }
+        })
+    }
+
     copy () {
       return new HGC(
         this.instructions,
@@ -54,36 +67,6 @@ export class HGC {
 
     currentInstruction (): Instruction {
       return this.instructions[this.pointer]
-    }
-
-    private stepOnce (): HGC {
-      const hgc: HGC = this.child()
-
-      hgc.seen.add(this.pointer)
-      hgc.terminated = hgc.pointer === hgc.instructions.length
-
-      if (hgc.terminated) {
-        return hgc
-      }
-
-      const { operation, argument } = hgc.currentInstruction()
-      switch (operation) {
-        case 'acc': {
-          hgc.accumulator += argument
-          hgc.pointer += 1
-          break
-        }
-        case 'jmp' : {
-          hgc.pointer += argument
-          break
-        }
-        case 'nop' : {
-          hgc.pointer += 1
-          break
-        }
-      }
-
-      return hgc
     }
 
     step (n: number = 1): HGC {
@@ -119,16 +102,33 @@ export class HGC {
       return hgc
     }
 
-    static fromFile (path: string): HGC {
-      return new HGC(HGC.instructionsFromFile(path))
-    }
+    private stepOnce (): HGC {
+      const hgc: HGC = this.child()
 
-    static instructionsFromFile (path: string): Instructions {
-      return readFile(path)
-        .split('\n')
-        .map(line => {
-          const [op, arg] = line.split(' ')
-          return { operation: op as Operation, argument: Number(arg) as number }
-        })
+      hgc.seen.add(this.pointer)
+      hgc.terminated = hgc.pointer === hgc.instructions.length
+
+      if (hgc.terminated) {
+        return hgc
+      }
+
+      const { operation, argument } = hgc.currentInstruction()
+      switch (operation) {
+        case 'acc': {
+          hgc.accumulator += argument
+          hgc.pointer += 1
+          break
+        }
+        case 'jmp' : {
+          hgc.pointer += argument
+          break
+        }
+        case 'nop' : {
+          hgc.pointer += 1
+          break
+        }
+      }
+
+      return hgc
     }
 }

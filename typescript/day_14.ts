@@ -64,7 +64,7 @@ function part2 (instructions: Array<Mask | SetMemory>): number {
   return Array.from(memory.values()).reduce(sumReducer)
 }
 
-function toBitArray (n: number, fill: number) : Array<string> {
+function toBitArray (n: number, fill: number): Array<string> {
   const arr = n.toString(2).split('')
   return Array(fill - arr.length).fill(0).concat(arr)
 }
@@ -78,12 +78,12 @@ function parseMask (line: string): Mask {
   return Array.from(Array.from(match[1]).entries())
 }
 
-function parseSet (line: string) : SetMemory {
+function parseSet (line: string): SetMemory {
   const match = regExtract(line, /mem\[(\d+)] = (\d+)/)
   return { address: Number(match[1]), value: Number(match[2]) }
 }
 
-function parseLine (line: string) : Mask | SetMemory {
+function parseLine (line: string): Mask | SetMemory {
   if (line.slice(0, 2) === 'ma') {
     return parseMask(line)
   } else {

@@ -18,10 +18,12 @@ function hasRequiredFields (passport: Passport): boolean {
   return REQUIRED.every(field => passport.has(field))
 }
 
-function validValues (passport: Passport) : boolean {
+function validValues (passport: Passport): boolean {
   return Array.from(passport.entries()).every(([k, v]) => {
     const regex = FIELDS.get(k)
-    if (regex === undefined) { throw new Error('bad field') }
+    if (regex === undefined) {
+      throw new Error('bad field')
+    }
     return regex.exec(v) !== null
   })
 }

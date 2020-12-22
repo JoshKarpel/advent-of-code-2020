@@ -2,8 +2,8 @@ import util = require('./util');
 
 function solve (
   answerGroups: Array<Array<string>>,
-  reducer: (acc : Set<string>, curr: Set<string>) => Set<string>,
-) : number {
+  reducer: (acc: Set<string>, curr: Set<string>) => Set<string>,
+): number {
   return answerGroups
     .map(group =>
       group

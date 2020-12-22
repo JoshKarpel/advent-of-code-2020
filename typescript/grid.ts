@@ -28,6 +28,14 @@ export class Grid2<T> {
       this.grid = grid
     }
 
+    static fromFile<T> (path: string, converter: (char: string) => T): Grid2<T> {
+      return new Grid2(
+        readFile(path)
+          .split('\n')
+          .map(line => line.split('').map(converter)),
+      )
+    }
+
     get (x: number, y: number): T | undefined {
       return (this.grid[y] || [])[x]
     }
@@ -103,13 +111,5 @@ export class Grid2<T> {
 
     display (): void {
       console.log(this.fmt() + '\n')
-    }
-
-    static fromFile<T> (path: string, converter: (char: string) => T): Grid2<T> {
-      return new Grid2(
-        readFile(path)
-          .split('\n')
-          .map(line => line.split('').map(converter)),
-      )
     }
 }

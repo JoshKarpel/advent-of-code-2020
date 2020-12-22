@@ -2,13 +2,13 @@ import { printSolution, readFile, sumReducer } from './util'
 
 type TokenType = '+' | '*' | '(' | ')' | 'number'
 type OperatorToken =
-  { type: '+', value: undefined } |
-  { type: '*', value: undefined }
+    { type: '+', value: undefined } |
+    { type: '*', value: undefined }
 type Token =
-  OperatorToken |
-  { type: '(', value: undefined } |
-  { type: ')', value: undefined } |
-  { type: 'number', value: number }
+    OperatorToken |
+    { type: '(', value: undefined } |
+    { type: ')', value: undefined } |
+    { type: 'number', value: number }
 
 function lex (equation: string): Array<Token> {
   return equation
@@ -32,106 +32,106 @@ function lex (equation: string): Array<Token> {
 type Operator = (left: number, right: number) => number
 
 interface Expression {
-  evaluate(): number
+    evaluate(): number
 }
 
 class Literal {
-  readonly value: number
+    readonly value: number
 
-  constructor (value: number) {
-    this.value = value
-  }
+    constructor (value: number) {
+      this.value = value
+    }
 
-  evaluate (): number {
-    return this.value
-  }
+    evaluate (): number {
+      return this.value
+    }
 }
 
 class Binary {
-  readonly left: Expression
-  readonly operator: Operator
-  readonly right: Expression
+    readonly left: Expression
+    readonly operator: Operator
+    readonly right: Expression
 
-  constructor (left: Expression, operator: Operator, right: Expression) {
-    this.left = left
-    this.operator = operator
-    this.right = right
-  }
+    constructor (left: Expression, operator: Operator, right: Expression) {
+      this.left = left
+      this.operator = operator
+      this.right = right
+    }
 
-  evaluate (): number {
-    return this.operator(this.left.evaluate(), this.right.evaluate())
-  }
+    evaluate (): number {
+      return this.operator(this.left.evaluate(), this.right.evaluate())
+    }
 }
 
 class Grouping {
-  readonly expression: Expression
+    readonly expression: Expression
 
-  constructor (expression: Expression) {
-    this.expression = expression
-  }
+    constructor (expression: Expression) {
+      this.expression = expression
+    }
 
-  evaluate (): number {
-    return this.expression.evaluate()
-  }
+    evaluate (): number {
+      return this.expression.evaluate()
+    }
 }
 
 const add = (left: number, right: number) => left + right
 const mul = (left: number, right: number) => left * right
 
 abstract class Parser {
-  readonly tokens: Array<Token>
-  pointer: number = 0
+    readonly tokens: Array<Token>
+    pointer: number = 0
 
-  constructor (tokens: Array<Token>) {
-    this.tokens = tokens
-  }
+    constructor (tokens: Array<Token>) {
+      this.tokens = tokens
+    }
 
-  abstract parse(): Expression
+    abstract parse(): Expression
 
-  match (...types: Array<TokenType>): boolean {
-    for (const type of types) {
+    match (...types: Array<TokenType>): boolean {
+      for (const type of types) {
+        if (this.check(type)) {
+          this.advance()
+          return true
+        }
+      }
+      return false
+    }
+
+    consume (type: TokenType, message: string) {
       if (this.check(type)) {
-        this.advance()
-        return true
+        return this.advance()
+      }
+
+      throw new Error(`Got ${this.peek().type} | ${message}`)
+    }
+
+    atEnd (): boolean {
+      return this.pointer === this.tokens.length
+    }
+
+    check (type: TokenType) {
+      if (this.atEnd()) {
+        return false
+      } else {
+        return type === this.peek().type
       }
     }
-    return false
-  }
 
-  consume (type: TokenType, message: string) {
-    if (this.check(type)) {
-      return this.advance()
+    advance (): Token {
+      if (!this.atEnd()) {
+        this.pointer += 1
+      }
+      return this.previous()
     }
 
-    throw new Error(`Got ${this.peek().type} | ${message}`)
-  }
-
-  atEnd (): boolean {
-    return this.pointer === this.tokens.length
-  }
-
-  check (type: TokenType) {
-    if (this.atEnd()) {
-      return false
-    } else {
-      return type === this.peek().type
+    peek (): Token {
+      return this.tokens[this.pointer]
     }
-  }
 
-  advance (): Token {
-    if (!this.atEnd()) {
-      this.pointer += 1
+    previous (): Token {
+      return this.tokens[this.pointer - 1]
     }
-    return this.previous()
-  }
-
-  peek (): Token {
-    return this.tokens[this.pointer]
-  }
-
-  previous (): Token {
-    return this.tokens[this.pointer - 1]
-  }
 }
 
 class ParseFlat extends Parser {

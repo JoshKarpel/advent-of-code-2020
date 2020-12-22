@@ -8,7 +8,7 @@ export function readFile (path: string): string {
   return fs.readFileSync(path, 'utf8').trimEnd()
 }
 
-export function * combinations<T> (arr: Array<T>, k: number) : Generator<Array<T>> {
+export function * combinations<T> (arr: Array<T>, k: number): Generator<Array<T>> {
   for (const [idx, elem] of arr.entries()) {
     if (k === 1) {
       yield [elem]
@@ -19,7 +19,8 @@ export function * combinations<T> (arr: Array<T>, k: number) : Generator<Array<T
     }
   }
 }
-export function * permutations<T> (arr: Array<T>, k: number) : Generator<Array<T>> {
+
+export function * permutations<T> (arr: Array<T>, k: number): Generator<Array<T>> {
   if (k === 1) {
     for (const elem of arr) {
       yield [elem]
@@ -64,11 +65,11 @@ export function mulReducer (accumulator: number, current: number): number {
   return accumulator * current
 }
 
-export function prefixSum (arr: Array<number>) : Array<number> {
-  return arr.reduce((acc:Array<number>, curr:number) => acc.concat([acc[acc.length - 1] + curr]), [0]).slice(1)
+export function prefixSum (arr: Array<number>): Array<number> {
+  return arr.reduce((acc: Array<number>, curr: number) => acc.concat([acc[acc.length - 1] + curr]), [0]).slice(1)
 }
 
-export function count<T> (arr: Array<T>) : Map<T, number> {
+export function count<T> (arr: Array<T>): Map<T, number> {
   const counter = new Map()
   for (const x of arr) {
     counter.set(x, (counter.get(x) || 0) + 1)
@@ -80,7 +81,7 @@ export function sortNumbers (a: number, b: number) {
   return a - b
 }
 
-export function mod (n: number, m: number) : number {
+export function mod (n: number, m: number): number {
   return ((n % m) + m) % m
 }
 
@@ -89,7 +90,7 @@ export function zip<A, B> (a: Array<A>, b: Array<B>): Array<[A, B]> {
 }
 
 // https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
-export function chineseRemainderSieve (divisorsAndRemainders: Array<[number, number]>) :number {
+export function chineseRemainderSieve (divisorsAndRemainders: Array<[number, number]>): number {
   let [increment, x] = divisorsAndRemainders[0]
 
   for (const [divisor, remainder] of divisorsAndRemainders.slice(1)) {
