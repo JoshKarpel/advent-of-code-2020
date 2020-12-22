@@ -1,6 +1,6 @@
 import fs = require('fs');
 
-export function printSolution (day: number, part: number, solution: number | null): void {
+export function printSolution (day: number, part: number, solution: number | string | null): void {
   console.log(`Day ${String(day).padStart(2, '0')}, Part ${part} => ${solution}`)
 }
 
