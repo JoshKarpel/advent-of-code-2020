@@ -1,4 +1,4 @@
-import { printSolution, readFile, regExtract, reverseString } from './util'
+import { count, mulReducer, printSolution, readFile, regExtract, reverseString } from './util'
 
 function range (length: number): Array<number> {
   return Array.from(Array(length).keys())
@@ -30,14 +30,40 @@ class Tile {
 }
 
 function part1 (tiles: Array<Tile>): number {
-  // console.log(tiles)
+  console.log(tiles.length)
+
+  // for (const tile of tiles) {
+  //   console.log(tile)
+  //   console.log(tile.borders())
+  //   console.log()
+  // }
+
+  const cornerTiles: Array<[number, Tile]> = []
   for (const tile of tiles) {
-    console.log(tile)
-    console.log(tile.borders())
-    console.log()
+    const allOtherEdges = count(
+      tiles
+        .filter(t => t.id !== tile.id)
+        .flatMap(tile => Array.from(new Set(tile.borders().flat()))),
+    )
+    // console.log(allOtherEdges)
+    for (const [idx, orientation] of tile.borders().entries()) {
+      // console.log(orientation)
+      const c: Map<number, number> = count(Array.from(orientation.map(e => allOtherEdges.get(e) || 0).values()))
+      // console.log('c', c)
+      if (c.get(0) === 2 && c.get(1) === 2) {
+        cornerTiles.push([idx, tile])
+      }
+    }
   }
 
-  return 0
+  console.log(cornerTiles)
+  const cornerTileIds = new Set(cornerTiles.map(([, tile]) => tile.id))
+  const cornerTiles2 = tiles.filter(tile => cornerTileIds.has(tile.id))
+
+  console.log(cornerTiles2)
+  console.log(cornerTiles2.length)
+
+  return cornerTiles2.map(tile => tile.id).reduce(mulReducer)
 }
 
 // I only have to find the border tiles (really just the corners)
