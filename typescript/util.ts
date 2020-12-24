@@ -65,6 +65,14 @@ export function mulReducer (accumulator: number, current: number): number {
   return accumulator * current
 }
 
+export function largeArrayMaxReducer (a: number, b: number): number {
+  return Math.max(a, b)
+}
+
+export function largeArrayMinReducer (a: number, b: number): number {
+  return Math.min(a, b)
+}
+
 export function prefixSum (arr: Array<number>): Array<number> {
   return arr.reduce((acc: Array<number>, curr: number) => acc.concat([acc[acc.length - 1] + curr]), [0]).slice(1)
 }
@@ -101,4 +109,28 @@ export function chineseRemainderSieve (divisorsAndRemainders: Array<[number, num
   }
 
   return x
+}
+
+export function rotateLeft<T> (arr: Array<T>, n: number) {
+  arr = [...arr]
+  if (arr.length === 0) {
+    return arr
+  } else {
+    for (let i = 0; i < n; i += 1) {
+      arr.push(arr.shift() as T)
+    }
+  }
+  return arr
+}
+
+export function rotateRight<T> (arr: Array<T>, n: number) {
+  arr = [...arr]
+  if (arr.length === 0) {
+    return arr
+  } else {
+    for (let i = 0; i < n; i += 1) {
+      arr.unshift(arr.pop() as T)
+    }
+  }
+  return arr
 }
