@@ -143,4 +143,4 @@ const cups = '952438716'.split('').map(Number)
 const oneMillionCups = cups.concat(range(10, 1_000_001))
 
 printSolution(23, 1, part1(cups, 100))
-printSolution(23, 1, part2(oneMillionCups, 10_000_000))
+printSolution(23, 2, part2(oneMillionCups, 10_000_000))
