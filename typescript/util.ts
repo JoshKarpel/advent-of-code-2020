@@ -132,3 +132,11 @@ export function rotateRight<T> (arr: Array<T>, n: number) {
   }
   return arr
 }
+
+export function copyMap<K, V> (map: Map<K, V>): Map<K, V> {
+  const newMap = new Map()
+  for (const [k, v] of map.entries()) {
+    newMap.set(k, v)
+  }
+  return newMap
+}
