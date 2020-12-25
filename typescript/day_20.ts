@@ -1,8 +1,4 @@
-import { mulReducer, printSolution, readFile, regExtract, zip } from './util'
-
-function range (length: number): Array<number> {
-  return Array.from(Array(length).keys())
-}
+import { count, mulReducer, printSolution, readFile, regExtract, reverseString, zip } from './util'
 
 type Pixels = Array<Array<string>>
 
@@ -25,21 +21,14 @@ class Tile {
       )
     }
 
-    flipTB (): Tile {
+    flip (): Tile {
       return new Tile(
         this.id,
         [...this.tile].reverse(),
       )
     }
 
-    flipLR (): Tile {
-      return new Tile(
-        this.id,
-        this.tile.map(row => [...row].reverse()),
-      )
-    }
-
-    rot () {
+    rotate () {
       return new Tile(
         this.id,
         this.tile[0].map((_, columnIdx) => this.tile.map(row => row[columnIdx])),
@@ -48,11 +37,15 @@ class Tile {
 
     borders (): Array<string> {
       const top = this.tile[0]
-      const bottom = this.tile[this.lastIndex - 1]
-      const left = range(this.lastIndex).map(x => this.tile[x][0])
-      const right = range(this.lastIndex).map(x => this.tile[x][this.lastIndex - 1])
+      const bottom = this.tile[this.lastIndex]
+      const left = Array.from(this.tile.keys()).map(x => this.tile[x][0])
+      const right = Array.from(this.tile.keys()).map(x => this.tile[x][this.lastIndex])
 
       return [top, bottom, left, right].map(b => b.join(''))
+    }
+
+    possibleEdges (): Array<string> {
+      return this.borders().flatMap(edge => [edge, reverseString(edge)])
     }
 
     bordersWithOffsets (): Array<[[number, number], string]> {
@@ -66,67 +59,26 @@ class Tile {
     }
 }
 
-function assemble (tiles: Array<Tile>) : Array<Array<Tile>> {
-  tiles = [...tiles]
-  const assembledTiles: Array<Array<Tile>> = Array.from(Array(tiles.length).keys()).map(_ => Array(tiles.length))
-  assembledTiles[5][5] = tiles[0]
+function findCorners (tiles: Array<Tile>) {
+  // every edge is unique, so any unpaired edge must be on the edge of the puzzle
+  const edgeCounts = count(
+    tiles.flatMap(tile => tile.possibleEdges()),
+  )
 
-  for (const tile of tiles.slice(1)) {
-    placeTile(assembledTiles, tile)
-  }
-
-  console.log(assembledTiles.map(row => row.map(tile => tile.id)))
-
-  return assembledTiles
-}
-
-function placeTile (assembledTiles: Array<Array<Tile>>, tile: Tile) {
-  for (const [y, row] of assembledTiles.entries()) {
-    for (const [x, placedTile] of row.entries()) {
-      if (placedTile === undefined) {
-        continue
-      }
-      for (const [[xOffset, yOffset], edge] of placedTile.bordersWithOffsets()) {
-        const matchingTile = findMatchingOrientation(edge, tile)
-        if (matchingTile !== undefined) {
-          assembledTiles[y + yOffset][x + xOffset] = matchingTile
-          console.log('Placed', matchingTile.id, 'at', x + xOffset, y + yOffset)
-          return
-        }
-      }
-    }
-  }
-}
-
-function findMatchingOrientation (edge: string, tile: Tile): Tile | undefined {
-  for (const orientation of [tile, tile.flipTB(), tile.flipLR(), tile.flipTB().flipLR(), tile.rot(), tile.rot().flipLR(), tile.rot().flipTB()]) {
-    if (orientation.borders().some(e => e === edge)) {
-      return orientation
-    }
-  }
-
-  return undefined
+  // a tile with two unpaired edges must be a corner
+  return tiles
+    .filter(tile => {
+      const edgeCountsForTile = count(
+        tile.borders()
+          .map(edge => edgeCounts.get(edge) || -1),
+      )
+      return edgeCountsForTile.get(1) === 2 && edgeCountsForTile.get(2) === 2
+    })
 }
 
 function part1 (tiles: Array<Tile>): number {
-  const assembled = assemble(tiles)
-
-  const n = assembled.length - 1
-  const cornerTiles = [
-    assembled[0][0],
-    assembled[0][n],
-    assembled[n][0],
-    assembled[n][n],
-  ]
-
-  return cornerTiles.map(tile => tile.id).reduce(mulReducer)
+  return findCorners(tiles).map(tile => tile.id).reduce(mulReducer)
 }
-
-// I only have to find the border tiles (really just the corners)
-// are the tile edges uniquely paired up?
-// if there are exactly an odd number of some edge, one of those tiles must appear on the edge
-// once you know all the odds you know all the edges
-// recur on the border (throw it out and find corners then build across again)
 
 const tiles = readFile('data/day_20.txt').split('\n\n').map(t => Tile.fromRaw(t))
 
