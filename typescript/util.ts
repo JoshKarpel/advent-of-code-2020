@@ -106,3 +106,36 @@ export function chineseRemainderSieve (divisorsAndRemainders: Array<[number, num
 export function reverseString (str: string): string {
   return str.split('').reverse().join('')
 }
+
+export function arrayEqual<T> (a: Array<T>, b: Array<T>): boolean {
+  if (a === b) {
+    return true
+  }
+  if (a == null || b == null) {
+    return false
+  }
+  if (a.length !== b.length) {
+    return false
+  }
+
+  for (let i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function rotate90<T> (arr: Array<Array<T>>): Array<Array<T>> {
+  const w = arr.length
+  const h = arr[0].length
+  const b = new Array(h)
+  for (let y = 0; y < h; y++) {
+    b[y] = new Array(w)
+    for (let x = 0; x < w; x++) {
+      b[y][x] = arr[w - 1 - x][y]
+    }
+  }
+  return b
+}

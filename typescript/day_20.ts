@@ -1,4 +1,4 @@
-import { count, mulReducer, printSolution, readFile, regExtract, reverseString, zip } from './util'
+import { arrayEqual, count, mulReducer, printSolution, readFile, regExtract, reverseString, rotate90, zip } from './util'
 
 type Pixels = Array<Array<string>>
 
@@ -31,7 +31,7 @@ class Tile {
     rotate () {
       return new Tile(
         this.id,
-        this.tile[0].map((_, columnIdx) => this.tile.map(row => row[columnIdx])),
+        rotate90(this.tile),
       )
     }
 
@@ -41,7 +41,12 @@ class Tile {
       const left = Array.from(this.tile.keys()).map(x => this.tile[x][0])
       const right = Array.from(this.tile.keys()).map(x => this.tile[x][this.lastIndex])
 
-      return [top, bottom, left, right].map(b => b.join(''))
+      return [
+        top,
+        right,
+        bottom,
+        left,
+      ].map(b => b.join(''))
     }
 
     possibleEdges (): Array<string> {
@@ -59,11 +64,13 @@ class Tile {
     }
 }
 
+function countEdges (tiles: Array<Tile>): Map<string, number> {
+  return count(tiles.flatMap(tile => tile.possibleEdges()))
+}
+
 function findCorners (tiles: Array<Tile>) {
   // every edge is unique, so any unpaired edge must be on the edge of the puzzle
-  const edgeCounts = count(
-    tiles.flatMap(tile => tile.possibleEdges()),
-  )
+  const edgeCounts = countEdges(tiles)
 
   // a tile with two unpaired edges must be a corner
   return tiles
@@ -80,6 +87,38 @@ function part1 (tiles: Array<Tile>): number {
   return findCorners(tiles).map(tile => tile.id).reduce(mulReducer)
 }
 
+function assembleTiles (tiles: Array<Tile>) : Array<Array<Tile>> {
+  const remainingTiles = new Set(tiles)
+  const edgeCounts = countEdges(tiles)
+
+  const sideLength = Math.sqrt(tiles.length)
+  const assembled = Array(sideLength)
+    .fill(undefined)
+    .map(_ => Array(sideLength).fill(undefined))
+
+  // place a corner tile
+  let topLeftCorner = findCorners(tiles)[0]
+  // find orientation
+  while (!arrayEqual(topLeftCorner.borders().map(edge => edgeCounts.get(edge)), [1, 2, 2, 1])) {
+    topLeftCorner = topLeftCorner.rotate() // no need to flip - this sets the flippiness of the whole puzzle
+  }
+  assembled[0][0] = topLeftCorner
+  remainingTiles.delete(topLeftCorner)
+
+  console.log(assembled)
+  console.log(remainingTiles.size)
+
+  return assembled
+}
+
+function part2 (tiles: Array<Tile>): number {
+  const assembled = assembleTiles(tiles)
+  console.log(assembled.map(row => row.map(tile => tile.id)))
+
+  return 0
+}
+
 const tiles = readFile('data/day_20.txt').split('\n\n').map(t => Tile.fromRaw(t))
 
 printSolution(20, 1, part1(tiles))
+printSolution(20, 2, part2(tiles))
