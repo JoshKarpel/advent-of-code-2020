@@ -139,3 +139,7 @@ export function rotate90<T> (arr: Array<Array<T>>): Array<Array<T>> {
   }
   return b
 }
+
+export function flipTopBottom<T> (arr: Array<Array<T>>): Array<Array<T>> {
+  return [...arr].reverse()
+}

@@ -1,4 +1,4 @@
-import { arrayEqual, count, mulReducer, printSolution, readFile, regExtract, reverseString, rotate90, zip } from './util'
+import { count, flipTopBottom, mulReducer, printSolution, readFile, regExtract, reverseString, rotate90 } from './util'
 
 type Pixels = Array<Array<string>>
 
@@ -24,7 +24,7 @@ class Tile {
     flip (): Tile {
       return new Tile(
         this.id,
-        [...this.tile].reverse(),
+        flipTopBottom(this.tile),
       )
     }
 
@@ -36,25 +36,45 @@ class Tile {
     }
 
     borders (): Array<string> {
-      const top = this.tile[0]
-      const bottom = this.tile[this.lastIndex]
-      const left = Array.from(this.tile.keys()).map(x => this.tile[x][0])
-      const right = Array.from(this.tile.keys()).map(x => this.tile[x][this.lastIndex])
-
       return [
-        top,
-        right,
-        bottom,
-        left,
-      ].map(b => b.join(''))
+        this.top(),
+        this.right(),
+        this.bottom(),
+        this.left(),
+      ]
+    }
+
+    left () {
+      return Array.from(this.tile.keys()).map(x => this.tile[x][0]).join('')
+    }
+
+    bottom () {
+      return this.tile[this.lastIndex].join('')
+    }
+
+    top () {
+      return this.tile[0].join('')
+    }
+
+    right () {
+      return Array.from(this.tile.keys()).map(x => this.tile[x][this.lastIndex]).join('')
     }
 
     possibleEdges (): Array<string> {
       return this.borders().flatMap(edge => [edge, reverseString(edge)])
     }
 
-    bordersWithOffsets (): Array<[[number, number], string]> {
-      return zip([[0, 1], [0, -1], [1, 0], [0, 1]], this.borders())
+    orientations (): Array<Tile> {
+      return [
+        this,
+        this.rotate(),
+        this.rotate().rotate(),
+        this.rotate().rotate().rotate(),
+        this.flip(),
+        this.flip().rotate(),
+        this.flip().rotate().rotate(),
+        this.flip().rotate().rotate().rotate(),
+      ]
     }
 
     image (): Pixels {
@@ -96,24 +116,56 @@ function assembleTiles (tiles: Array<Tile>) : Array<Array<Tile>> {
     .fill(undefined)
     .map(_ => Array(sideLength).fill(undefined))
 
-  // place a corner tile
-  let topLeftCorner = findCorners(tiles)[0]
-  // find orientation
-  while (!arrayEqual(topLeftCorner.borders().map(edge => edgeCounts.get(edge)), [1, 2, 2, 1])) {
-    topLeftCorner = topLeftCorner.rotate() // no need to flip - this sets the flippiness of the whole puzzle
-  }
-  assembled[0][0] = topLeftCorner
-  remainingTiles.delete(topLeftCorner)
+  let referenceTile: Tile = tiles[0]
 
-  console.log(assembled)
-  console.log(remainingTiles.size)
+  for (const [rowIdx, row] of assembled.entries()) {
+    for (const colIdx of row.keys()) {
+      let nextTile
+      let nextTileOriented
+      if (rowIdx === 0 && colIdx === 0) {
+        nextTile = findCorners(tiles)[0]
+        nextTileOriented = nextTile.orientations().find(
+          tile => edgeCounts.get(tile.top()) === 1 && edgeCounts.get(tile.left()) === 1,
+        )
+        if (nextTileOriented === undefined) {
+          throw new Error('could not figure out orientation of top left corner')
+        }
+      } else if (colIdx === 0) {
+        referenceTile = assembled[rowIdx - 1][colIdx]
+        const referenceEdge = referenceTile.bottom()
+        nextTile = Array.from(remainingTiles).find(tile => new Set(tile.possibleEdges()).has(referenceEdge))
+        if (nextTile === undefined) {
+          throw new Error('could not figure out next tile (row start)')
+        }
+        nextTileOriented = nextTile.orientations().find(tile => tile.top() === referenceEdge)
+        if (nextTileOriented === undefined) {
+          throw new Error('could not orient next tile (row start)')
+        }
+      } else {
+        const referenceEdge = referenceTile.right()
+        nextTile = Array.from(remainingTiles).find(tile => new Set(tile.possibleEdges()).has(referenceEdge))
+        if (nextTile === undefined) {
+          throw new Error('could not figure out next tile')
+        }
+        nextTileOriented = nextTile.orientations().find(tile => tile.left() === referenceEdge)
+        if (nextTileOriented === undefined) {
+          throw new Error('could not orient next tile')
+        }
+      }
+
+      row[colIdx] = nextTileOriented
+      remainingTiles.delete(nextTile)
+      referenceTile = nextTileOriented
+    }
+  }
 
   return assembled
 }
 
 function part2 (tiles: Array<Tile>): number {
-  const assembled = assembleTiles(tiles)
-  console.log(assembled.map(row => row.map(tile => tile.id)))
+  const assembled = rotate90(flipTopBottom(assembleTiles(tiles)))
+
+  console.log(assembled.map(row => row.map(tile => tile.id).join(' ')).join('\n'))
 
   return 0
 }
