@@ -1,4 +1,4 @@
-import { copyMap, printSolution, readFile } from './util'
+import { copySet, printSolution, readFile } from './util'
 import { Vector2 } from './vector'
 
 const DIRECTIONS = new Map([
@@ -10,14 +10,11 @@ const DIRECTIONS = new Map([
   ['se', new Vector2(-1, -1)],
 ])
 
-const BLACK = 'b'
-const WHITE = 'w'
-type Black = typeof BLACK
-type White = typeof WHITE
 type Key = string
+type BlackTiles = Set<Key>
 
-function key (vec: Vector2): Key {
-  return `${vec.x}|${vec.y}`
+function key (tile: Vector2): Key {
+  return `${tile.x}|${tile.y}`
 }
 
 function invertKey (key: Key): Vector2 {
@@ -30,55 +27,62 @@ function neighbours (position: Vector2): Array<Vector2> {
     .map(offset => position.add(offset))
 }
 
-function initialize (tiles: Array<Array<Vector2>>): Map<Key, Black | White> {
-  const tileColors: Map<Key, Black | White> = new Map()
+function initialize (tiles: Array<Array<Vector2>>): BlackTiles {
+  const blackTiles: BlackTiles = new Set()
 
   for (const directions of tiles) {
     const dir = directions.reduce((a, b) => a.add(b))
-    tileColors.set(
-      key(dir),
-      (tileColors.get(key(dir)) || WHITE) === WHITE ? BLACK : WHITE,
-    )
+    const k = key(dir)
+    if (blackTiles.has(k)) {
+      blackTiles.delete(k)
+    } else {
+      blackTiles.add(k)
+    }
   }
 
-  return tileColors
-}
-
-function countBlackTiles (tileColors: Map<string, Black | White>) {
-  return Array.from(tileColors.values()).filter(color => color === BLACK).length
+  return blackTiles
 }
 
 function part1 (tiles: Array<Array<Vector2>>): number {
-  const tileColors = initialize(tiles)
-  return Array.from(tileColors.values()).filter(color => color === BLACK).length
+  const blackTiles = initialize(tiles)
+
+  return blackTiles.size
 }
 
-function part2 (tiles: Array<Array<Vector2>>): number {
-  let tileColors = initialize(tiles)
+function part2 (tiles: Array<Array<Vector2>>, days: number): number {
+  let blackTiles = initialize(tiles)
 
-  for (let day = 0; day < 100; day += 1) {
-    const newTileColors = copyMap(tileColors)
+  for (let day = 0; day < days; day += 1) {
+    const newBlackTiles = copySet(blackTiles)
 
-    let toCheck = Array.from(tileColors.keys()).map(invertKey)
-    toCheck = Array.from(new Set(toCheck.concat(...toCheck.flatMap(v => neighbours(v)))))
+    const blackTilePositions = Array.from(blackTiles).map(invertKey)
+    const tilesToCheck = new Set(
+      blackTilePositions.concat(
+        blackTilePositions
+          .map(v => neighbours(v))
+          .flat(),
+      ),
+    )
 
-    for (const vec of toCheck) {
-      const tileColor = tileColors.get(key(vec)) || WHITE
-      const numBlackNeighbours = neighbours(vec)
-        .map(v => tileColors.get(key(v)) || WHITE)
-        .filter(color => color === BLACK)
+    for (const tile of tilesToCheck) {
+      const k = key(tile)
+
+      const isBlack = blackTiles.has(k)
+      const numBlackNeighbours = neighbours(tile)
+        .filter(neighbour => blackTiles.has(key(neighbour)))
         .length
 
-      if (tileColor === BLACK && (numBlackNeighbours === 0 || numBlackNeighbours > 2)) {
-        newTileColors.set(key(vec), WHITE)
-      } else if (tileColor === WHITE && (numBlackNeighbours === 2)) {
-        newTileColors.set(key(vec), BLACK)
+      if (isBlack && (numBlackNeighbours === 0 || numBlackNeighbours > 2)) {
+        newBlackTiles.delete(k)
+      } else if (!isBlack && (numBlackNeighbours === 2)) {
+        newBlackTiles.add(k)
       }
     }
-    tileColors = newTileColors
+
+    blackTiles = newBlackTiles
   }
 
-  return countBlackTiles(tileColors)
+  return blackTiles.size
 }
 
 const tiles = readFile('data/day_24.txt')
@@ -87,4 +91,4 @@ const tiles = readFile('data/day_24.txt')
   .map(directions => directions.map(d => DIRECTIONS.get(d) || Vector2.zero()))
 
 printSolution(24, 1, part1(tiles))
-printSolution(24, 2, part2(tiles))
+printSolution(24, 2, part2(tiles, 100))

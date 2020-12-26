@@ -141,6 +141,10 @@ export function copyMap<K, V> (map: Map<K, V>): Map<K, V> {
   return newMap
 }
 
+export function copySet<T> (set : Set<T>) : Set<T> {
+  return new Set([...set])
+}
+
 export function reverseString (str: string): string {
   return str.split('').reverse().join('')
 }
