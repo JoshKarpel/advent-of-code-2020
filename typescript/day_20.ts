@@ -24,18 +24,15 @@ class Image {
     static combine (grid: Array<Array<Image>>): Image {
       const innerSideLength = grid[0][0].sideLength
       const gridSideLength = grid.length * innerSideLength
-      console.log(innerSideLength, gridSideLength)
       const pixels = Array(gridSideLength)
         .fill(null)
         .map(_ => Array(gridSideLength))
-      console.log(pixels)
       for (const [gridY, row] of grid.entries()) {
         for (const [gridX, tile] of row.entries()) {
           for (const [tileY, tileRow] of tile.pixels.entries()) {
             for (const [tileX, pixel] of tileRow.entries()) {
               const y = (gridY * innerSideLength) + tileY
               const x = (gridX * innerSideLength) + tileX
-              console.log(y, x)
               pixels[y][x] = pixel
             }
           }
@@ -181,19 +178,44 @@ function assembleTiles (tiles: Array<Image>): Array<Array<Image>> {
   return assembled
 }
 
+const SEA_MONSTER = [
+  '                  # ',
+  '#    ##    ##    ###',
+  ' #  #  #  #  #  #   ',
+]
+const SEA_MONSTER_LENGTH = SEA_MONSTER
+  .flatMap(row => row.split(''))
+  .filter(char => char === '#')
+  .length
+
+function hasSeaMonster (image: Image, startY: number, startX: number): boolean {
+  return SEA_MONSTER
+    .every((row, y) =>
+      row
+        .split('')
+        .every((char, x) => char === ' ' || char === image.pixels[startY + y][startX + x]),
+    )
+}
+
 function part2 (tiles: Array<Image>): number {
   const assembled = assembleTiles(tiles)
-
-  console.log(assembled.map(row => row.map(tile => tile.id).join(' ')).join('\n'))
 
   const withoutBorders = assembled.map(row => row.map(image => image.withoutBorder()))
   const image = Image.combine(withoutBorders)
 
-  console.log(image.format())
-  console.log()
-  console.log(image.rotate().flip().rotate().rotate().format())
+  for (const im of image.orientations()) {
+    const numSeaMonsters = im.pixels
+      .slice(0, im.pixels.length - 2)
+      .flatMap((row, y) => row.map((_, x) => hasSeaMonster(im, y, x)))
+      .filter(b => b)
+      .length
 
-  return 0
+    if (numSeaMonsters > 0) {
+      return im.pixels.flatMap(row => row.filter(c => c === '#')).length - (SEA_MONSTER_LENGTH * numSeaMonsters)
+    }
+  }
+
+  return -1
 }
 
 const tiles = readFile('data/day_20.txt').split('\n\n').map(t => Image.fromRaw(t))
