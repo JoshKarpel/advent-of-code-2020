@@ -21,6 +21,32 @@ class Image {
       )
     }
 
+    static combine (grid: Array<Array<Image>>): Image {
+      const innerSideLength = grid[0][0].sideLength
+      const gridSideLength = grid.length * innerSideLength
+      console.log(innerSideLength, gridSideLength)
+      const pixels = Array(gridSideLength)
+        .fill(null)
+        .map(_ => Array(gridSideLength))
+      console.log(pixels)
+      for (const [gridY, row] of grid.entries()) {
+        for (const [gridX, tile] of row.entries()) {
+          for (const [tileY, tileRow] of tile.pixels.entries()) {
+            for (const [tileX, pixel] of tileRow.entries()) {
+              const y = (gridY * innerSideLength) + tileY
+              const x = (gridX * innerSideLength) + tileX
+              console.log(y, x)
+              pixels[y][x] = pixel
+            }
+          }
+        }
+      }
+      return new Image(
+        0,
+        pixels,
+      )
+    }
+
     flip (): Image {
       return new Image(this.id, flipTopBottom(this.pixels))
     }
@@ -66,21 +92,18 @@ class Image {
       ]
     }
 
-    removeBorder (): Image {
+    withoutBorder (): Image {
       return new Image(
         this.id,
         this.pixels
-          .slice(1, this.sideLength - 2)
-          .map(row => row.slice(1, this.sideLength - 2)),
+          .slice(1, this.sideLength - 1)
+          .map(row => row.slice(1, this.sideLength - 1)),
       )
     }
 
-  // combine (grid: Array<Array<Image>>) : Image {
-  //   return new Image(
-  //     0,
-  //     pixels,
-  //   )
-  // }
+    format (): string {
+      return this.pixels.map(row => row.join('')).join('\n')
+    }
 }
 
 function countEdges (tiles: Array<Image>): Map<string, number> {
@@ -159,9 +182,16 @@ function assembleTiles (tiles: Array<Image>): Array<Array<Image>> {
 }
 
 function part2 (tiles: Array<Image>): number {
-  const assembled = rotate90(flipTopBottom(assembleTiles(tiles)))
+  const assembled = assembleTiles(tiles)
 
   console.log(assembled.map(row => row.map(tile => tile.id).join(' ')).join('\n'))
+
+  const withoutBorders = assembled.map(row => row.map(image => image.withoutBorder()))
+  const image = Image.combine(withoutBorders)
+
+  console.log(image.format())
+  console.log()
+  console.log(image.rotate().flip().rotate().rotate().format())
 
   return 0
 }
