@@ -16,7 +16,7 @@ type Black = typeof BLACK
 type White = typeof WHITE
 type Key = string
 
-function key (vec: Vector2) : Key {
+function key (vec: Vector2): Key {
   return `${vec.x}|${vec.y}`
 }
 
@@ -25,12 +25,12 @@ function invertKey (key: Key): Vector2 {
   return new Vector2(x, y)
 }
 
-function neighbours (position: Vector2) : Array<Vector2> {
+function neighbours (position: Vector2): Array<Vector2> {
   return Array.from(DIRECTIONS.values())
     .map(offset => position.add(offset))
 }
 
-function initialize (tiles: Array<Array<Vector2>>) : Map<Key, Black | White> {
+function initialize (tiles: Array<Array<Vector2>>): Map<Key, Black | White> {
   const tileColors: Map<Key, Black | White> = new Map()
 
   for (const directions of tiles) {
