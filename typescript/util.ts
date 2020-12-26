@@ -140,3 +140,24 @@ export function copyMap<K, V> (map: Map<K, V>): Map<K, V> {
   }
   return newMap
 }
+
+export function reverseString (str: string): string {
+  return str.split('').reverse().join('')
+}
+
+export function rotate90<T> (arr: Array<Array<T>>): Array<Array<T>> {
+  const w = arr.length
+  const h = arr[0].length
+  const b = new Array(h)
+  for (let y = 0; y < h; y++) {
+    b[y] = new Array(w)
+    for (let x = 0; x < w; x++) {
+      b[y][x] = arr[w - 1 - x][y]
+    }
+  }
+  return b
+}
+
+export function flipTopBottom<T> (arr: Array<Array<T>>): Array<Array<T>> {
+  return [...arr].reverse()
+}
