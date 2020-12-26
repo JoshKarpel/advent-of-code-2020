@@ -41,7 +41,9 @@ function part2 (numbers: Array<number>): number {
   }
 }
 
-const numbers = readFile('data/day_09.txt').split('\n').map(Number)
+const numbers = readFile('data/day_09.txt')
+  .split('\n')
+  .map(Number)
 
 printSolution(9, 1, part1(numbers))
 printSolution(9, 2, part2(numbers))

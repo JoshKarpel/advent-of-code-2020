@@ -1,4 +1,4 @@
-import { maxReducer, minReducer, printSolution } from './util'
+import { maxReducer, minReducer, printSolution, range } from './util'
 
 class Cup<T> {
     readonly value: T
@@ -129,14 +129,6 @@ function part2 (cups: Array<number>, turns: number): number {
   }
 
   return cupOne.forward(1).value * cupOne.forward(2).value
-}
-
-function range (start: number, stop: number): Array<number> {
-  const arr = []
-  for (let i = start; i < stop; i += 1) {
-    arr.push(i)
-  }
-  return arr
 }
 
 const cups = '952438716'.split('').map(Number)

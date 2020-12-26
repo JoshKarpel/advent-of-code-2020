@@ -1,4 +1,4 @@
-import util = require('./util');
+import { printSolution, readFile } from './util'
 
 const TREE = '#'
 
@@ -33,7 +33,7 @@ function part2 (map: ReadonlyArray<string>): number {
     .reduce((acc, curr) => acc * curr)
 }
 
-const map = util.readFile('data/day_03.txt').split('\n')
+const map = readFile('data/day_03.txt').split('\n')
 
-util.printSolution(3, 1, part1(map))
-util.printSolution(3, 2, part2(map))
+printSolution(3, 1, part1(map))
+printSolution(3, 2, part2(map))

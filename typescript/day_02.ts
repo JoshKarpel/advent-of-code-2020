@@ -1,4 +1,4 @@
-import util = require('./util');
+import { printSolution, readFile, regExtract } from './util'
 
 interface Entry {
     first: number,
@@ -9,7 +9,7 @@ interface Entry {
 
 function part1 (entries: Array<Entry>): number {
   return entries.filter(entry => {
-    const count = Array.from(entry.password).filter(char => char === entry.letter).length
+    const count = entry.password.split('').filter(char => char === entry.letter).length
     return entry.first <= count && count <= entry.second
   }).length
 }
@@ -22,9 +22,9 @@ function part2 (entries: Array<Entry>): number {
   }).length
 }
 
-const entries = util.readFile('data/day_02.txt')
+const entries = readFile('data/day_02.txt')
   .split('\n')
-  .map(line => util.regExtract(line, /(\d+)-(\d+) (\w): (\w+)/))
+  .map(line => regExtract(line, /(\d+)-(\d+) (\w): (\w+)/))
   .map(match => {
     return {
       first: Number(match[1]),
@@ -34,5 +34,5 @@ const entries = util.readFile('data/day_02.txt')
     }
   })
 
-util.printSolution(2, 1, part1(entries))
-util.printSolution(2, 2, part2(entries))
+printSolution(2, 1, part1(entries))
+printSolution(2, 2, part2(entries))

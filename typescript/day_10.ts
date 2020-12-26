@@ -1,4 +1,4 @@
-import { count, printSolution, readFile, sortNumbers, sumReducer } from './util'
+import { compareNumbers, count, printSolution, readFile, sumReducer } from './util'
 
 const START = 0
 
@@ -69,7 +69,7 @@ function part2WithoutRecursion (adapters: Array<number>): number {
 
   const numPathsTo = new Map([[0, 1]])
 
-  for (const adapter of Array.from(graph.keys()).sort(sortNumbers)) {
+  for (const adapter of Array.from(graph.keys()).sort(compareNumbers)) {
     const numPathsToHere = numPathsTo.get(adapter) || 0
 
     for (const next of (graph.get(adapter) || [])) {

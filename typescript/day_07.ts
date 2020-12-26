@@ -1,5 +1,4 @@
-import { sumReducer } from './util'
-import util = require('./util');
+import { printSolution, readFile, regExtract, sumReducer } from './util'
 
 type Rules = Map<string, Map<string, number>>
 
@@ -22,8 +21,9 @@ function unpackBag (startingBag: string, rules: Rules): Map<string, number> {
 }
 
 function unpackAllBags (rules: Rules): Map<string, Map<string, number>> {
-  return new Map(Array.from(rules.keys())
-    .map(startingBag => [startingBag, unpackBag(startingBag, rules)]),
+  return new Map(
+    Array.from(rules.keys())
+      .map(startingBag => [startingBag, unpackBag(startingBag, rules)]),
   )
 }
 
@@ -42,14 +42,14 @@ function part2 (rules: Rules): number {
 }
 
 const rules = new Map(
-  util.readFile('data/day_07.txt')
+  readFile('data/day_07.txt')
     .split('\n')
     .map(line => {
-      const container = util.regExtract(line, /^(\w+\s\w+)/g)[0]
+      const container = regExtract(line, /^(\w+\s\w+)/g)[0]
       const contains = (line.match(/(\d+)\s(\w+\s\w+)/g) || []).map(c => [c.slice(2), Number(c[0])]) as Array<[string, number]>
       return [container, new Map(contains)]
     }),
 ) as Rules
 
-util.printSolution(7, 1, part1(rules))
-util.printSolution(7, 2, part2(rules))
+printSolution(7, 1, part1(rules))
+printSolution(7, 2, part2(rules))

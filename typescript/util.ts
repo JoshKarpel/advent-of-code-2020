@@ -85,7 +85,7 @@ export function count<T> (arr: Array<T>): Map<T, number> {
   return counter
 }
 
-export function sortNumbers (a: number, b: number) {
+export function compareNumbers (a: number, b: number) {
   return a - b
 }
 
@@ -141,7 +141,7 @@ export function copyMap<K, V> (map: Map<K, V>): Map<K, V> {
   return newMap
 }
 
-export function copySet<T> (set : Set<T>) : Set<T> {
+export function copySet<T> (set: Set<T>): Set<T> {
   return new Set([...set])
 }
 
@@ -164,4 +164,8 @@ export function rotate90<T> (arr: Array<Array<T>>): Array<Array<T>> {
 
 export function flipTopBottom<T> (arr: Array<Array<T>>): Array<Array<T>> {
   return [...arr].reverse()
+}
+
+export function range (start: number, stop: number): Array<number> {
+  return Array.from(Array(stop - start).keys()).map(x => x + start)
 }
