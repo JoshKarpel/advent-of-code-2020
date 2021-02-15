@@ -16,7 +16,7 @@ repos:
         args: ["--autofix"]
         exclude: '^tsconfig.json$'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v7.19.0
+    rev: v7.20.0
     hooks:
       - id: eslint
         args: ["--fix"]
