@@ -1,65 +1,65 @@
 import { maxReducer, minReducer, printSolution, range } from './util'
 
 class Cup<T> {
-    readonly value: T
-    next: Cup<T> | null
+  readonly value: T
+  next: Cup<T> | null
 
-    constructor (
-      value: T,
-      next: Cup<T> | null,
-    ) {
-      this.value = value
-      this.next = next
+  constructor (
+    value: T,
+    next: Cup<T> | null,
+  ) {
+    this.value = value
+    this.next = next
+  }
+
+  static fromArray<T> (cups: Array<T>): Cup<T> {
+    const first = new Cup(cups[0], null)
+    let curr: Cup<T> = first
+    for (const cup of cups.slice(1)) {
+      const nextNode = new Cup(cup, null)
+      curr.next = nextNode
+      curr = nextNode
     }
+    curr.next = first
+    return first
+  }
 
-    static fromArray<T> (cups: Array<T>): Cup<T> {
-      const first = new Cup(cups[0], null)
-      let curr: Cup<T> = first
-      for (const cup of cups.slice(1)) {
-        const nextNode = new Cup(cup, null)
-        curr.next = nextNode
-        curr = nextNode
+  walk<U> (callback: (cup: Cup<T>) => U): Array<U> {
+    let node: Cup<T> = this
+    const arr = [callback(node)]
+    while (node.next !== this && node.next !== null) {
+      node = node.next
+      arr.push(callback(node))
+    }
+    return arr
+  }
+
+  toArray (): Array<T> {
+    return this.walk(node => node.value)
+  }
+
+  forward (n: number) {
+    let node: Cup<T> = this
+    for (let i = 0; i < n; i += 1) {
+      if (node.next === null) {
+        console.log(node)
+        throw new Error('woops, forward ref was null')
       }
-      curr.next = first
-      return first
+      node = node.next
     }
+    return node
+  }
 
-    walk<U> (callback: (cup: Cup<T>) => U): Array<U> {
-      let node: Cup<T> = this
-      const arr = [callback(node)]
-      while (node.next !== this && node.next !== null) {
-        node = node.next
-        arr.push(callback(node))
+  findForward (value: T): Cup<T> | null {
+    let node: Cup<T> | null = this
+    while (node.value !== value) {
+      node = node.next
+      if (node === null || node === this) {
+        return null
       }
-      return arr
     }
-
-    toArray (): Array<T> {
-      return this.walk(node => node.value)
-    }
-
-    forward (n: number) {
-      let node: Cup<T> = this
-      for (let i = 0; i < n; i += 1) {
-        if (node.next === null) {
-          console.log(node)
-          throw new Error('woops, forward ref was null')
-        }
-        node = node.next
-      }
-      return node
-    }
-
-    findForward (value: T): Cup<T> | null {
-      let node: Cup<T> | null = this
-      while (node.value !== value) {
-        node = node.next
-        if (node === null || node === this) {
-          return null
-        }
-      }
-      return node
-    }
+    return node
+  }
 }
 
 function play (cups: Array<number>, moves: number): Cup<number> {

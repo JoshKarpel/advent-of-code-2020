@@ -3,104 +3,104 @@ import { count, flipTopBottom, mulReducer, printSolution, readFile, regExtract, 
 type Pixels = Array<Array<string>>
 
 class Image {
-    readonly id: number
-    readonly pixels: Pixels
-    readonly sideLength: number
+  readonly id: number
+  readonly pixels: Pixels
+  readonly sideLength: number
 
-    constructor (id: number, tile: Pixels) {
-      this.id = id
-      this.pixels = tile
-      this.sideLength = tile.length
-    }
+  constructor (id: number, tile: Pixels) {
+    this.id = id
+    this.pixels = tile
+    this.sideLength = tile.length
+  }
 
-    static fromRaw (tile: string) {
-      const t = tile.split('\n')
-      return new Image(
-        Number(regExtract(t[0], /Tile (\d+):/)[1]),
-        t.slice(1).map(row => row.split('')),
-      )
-    }
+  static fromRaw (tile: string) {
+    const t = tile.split('\n')
+    return new Image(
+      Number(regExtract(t[0], /Tile (\d+):/)[1]),
+      t.slice(1).map(row => row.split('')),
+    )
+  }
 
-    static combine (grid: Array<Array<Image>>): Image {
-      const innerSideLength = grid[0][0].sideLength
-      const gridSideLength = grid.length * innerSideLength
-      const pixels = Array(gridSideLength)
-        .fill(null)
-        .map(_ => Array(gridSideLength))
-      for (const [gridY, row] of grid.entries()) {
-        for (const [gridX, tile] of row.entries()) {
-          for (const [tileY, tileRow] of tile.pixels.entries()) {
-            for (const [tileX, pixel] of tileRow.entries()) {
-              const y = (gridY * innerSideLength) + tileY
-              const x = (gridX * innerSideLength) + tileX
-              pixels[y][x] = pixel
-            }
+  static combine (grid: Array<Array<Image>>): Image {
+    const innerSideLength = grid[0][0].sideLength
+    const gridSideLength = grid.length * innerSideLength
+    const pixels = Array(gridSideLength)
+      .fill(null)
+      .map(_ => Array(gridSideLength))
+    for (const [gridY, row] of grid.entries()) {
+      for (const [gridX, tile] of row.entries()) {
+        for (const [tileY, tileRow] of tile.pixels.entries()) {
+          for (const [tileX, pixel] of tileRow.entries()) {
+            const y = (gridY * innerSideLength) + tileY
+            const x = (gridX * innerSideLength) + tileX
+            pixels[y][x] = pixel
           }
         }
       }
-      return new Image(
-        0,
-        pixels,
-      )
     }
+    return new Image(
+      0,
+      pixels,
+    )
+  }
 
-    flip (): Image {
-      return new Image(this.id, flipTopBottom(this.pixels))
-    }
+  flip (): Image {
+    return new Image(this.id, flipTopBottom(this.pixels))
+  }
 
-    rotate () {
-      return new Image(this.id, rotate90(this.pixels))
-    }
+  rotate () {
+    return new Image(this.id, rotate90(this.pixels))
+  }
 
-    borders (): Array<string> {
-      return [this.top(), this.right(), this.bottom(), this.left()]
-    }
+  borders (): Array<string> {
+    return [this.top(), this.right(), this.bottom(), this.left()]
+  }
 
-    left () {
-      return Array.from(this.pixels.keys()).map(x => this.pixels[x][0]).join('')
-    }
+  left () {
+    return Array.from(this.pixels.keys()).map(x => this.pixels[x][0]).join('')
+  }
 
-    bottom () {
-      return this.pixels[this.sideLength - 1].join('')
-    }
+  bottom () {
+    return this.pixels[this.sideLength - 1].join('')
+  }
 
-    top () {
-      return this.pixels[0].join('')
-    }
+  top () {
+    return this.pixels[0].join('')
+  }
 
-    right () {
-      return Array.from(this.pixels.keys()).map(x => this.pixels[x][this.sideLength - 1]).join('')
-    }
+  right () {
+    return Array.from(this.pixels.keys()).map(x => this.pixels[x][this.sideLength - 1]).join('')
+  }
 
-    possibleEdges (): Array<string> {
-      return this.borders().flatMap(edge => [edge, reverseString(edge)])
-    }
+  possibleEdges (): Array<string> {
+    return this.borders().flatMap(edge => [edge, reverseString(edge)])
+  }
 
-    orientations (): Array<Image> {
-      return [
-        this,
-        this.rotate(),
-        this.rotate().rotate(),
-        this.rotate().rotate().rotate(),
-        this.flip(),
-        this.flip().rotate(),
-        this.flip().rotate().rotate(),
-        this.flip().rotate().rotate().rotate(),
-      ]
-    }
+  orientations (): Array<Image> {
+    return [
+      this,
+      this.rotate(),
+      this.rotate().rotate(),
+      this.rotate().rotate().rotate(),
+      this.flip(),
+      this.flip().rotate(),
+      this.flip().rotate().rotate(),
+      this.flip().rotate().rotate().rotate(),
+    ]
+  }
 
-    withoutBorder (): Image {
-      return new Image(
-        this.id,
-        this.pixels
-          .slice(1, this.sideLength - 1)
-          .map(row => row.slice(1, this.sideLength - 1)),
-      )
-    }
+  withoutBorder (): Image {
+    return new Image(
+      this.id,
+      this.pixels
+        .slice(1, this.sideLength - 1)
+        .map(row => row.slice(1, this.sideLength - 1)),
+    )
+  }
 
-    format (): string {
-      return this.pixels.map(row => row.join('')).join('\n')
-    }
+  format (): string {
+    return this.pixels.map(row => row.join('')).join('\n')
+  }
 }
 
 function countEdges (tiles: Array<Image>): Map<string, number> {
