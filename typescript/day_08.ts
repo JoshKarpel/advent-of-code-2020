@@ -14,9 +14,9 @@ export class HGC {
 
   constructor (
     instructions: Instructions,
-    pointer: number = 0,
-    accumulator: number = 0,
-    terminated: boolean = false,
+    pointer = 0,
+    accumulator = 0,
+    terminated = false,
     seen: Set<number> = new Set(),
     parent: HGC | null = null,
   ) {
@@ -69,7 +69,7 @@ export class HGC {
     return this.instructions[this.pointer]
   }
 
-  step (n: number = 1): HGC {
+  step (n = 1): HGC {
     let hgc: HGC = this
 
     for (let i = 0; i < n; i += 1) {
@@ -79,7 +79,7 @@ export class HGC {
     return hgc
   }
 
-  rewind (n: number = 1): HGC {
+  rewind (n = 1): HGC {
     let hgc: HGC = this
 
     for (let i = 0; i < n; i += 1) {

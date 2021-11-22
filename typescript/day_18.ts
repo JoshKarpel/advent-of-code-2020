@@ -80,7 +80,7 @@ const mul = (left: number, right: number) => left * right
 
 abstract class Parser {
   readonly tokens: Array<Token>
-  pointer: number = 0
+  pointer = 0
 
   constructor (tokens: Array<Token>) {
     this.tokens = tokens

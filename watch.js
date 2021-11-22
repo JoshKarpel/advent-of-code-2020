@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const concurrently = require('concurrently')
+const concurrently = require('concurrently')  // eslint-disable-line  @typescript-eslint/no-var-requires
 
 concurrently(
   [

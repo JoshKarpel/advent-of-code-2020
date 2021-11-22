@@ -1,5 +1,6 @@
-import { printSolution, readFile } from './util'
 import { isDeepStrictEqual } from 'util'
+
+import { printSolution, readFile } from './util'
 
 const FLOOR = '.'
 const EMPTY = 'L'
